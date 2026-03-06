@@ -1062,18 +1062,6 @@ export const CreatePortfolioModal = ({ isOpen, onClose, onSuccess, initialData, 
                           </p>
                         )}
                       </div>
-                      {/* Character count progress bar for Profile Summary */}
-                      <div className="w-full h-1 bg-white/10 rounded-full overflow-hidden">
-                        <div
-                          className={`h-full transition-all duration-300 ${formData.profileSummary.length >= MAX_PROFILE_SUMMARY
-                              ? 'bg-red-500'
-                              : formData.profileSummary.length >= MAX_PROFILE_SUMMARY * 0.8
-                                ? 'bg-yellow-500'
-                                : 'bg-[#FFAB00]'
-                            }`}
-                          style={{ width: `${(formData.profileSummary.length / MAX_PROFILE_SUMMARY) * 100}%` }}
-                        />
-                      </div>
                     </div>
                   </div>
 

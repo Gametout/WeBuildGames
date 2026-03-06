@@ -162,8 +162,8 @@ const ContactSection = () => {
                 className="h-[2px] bg-primary mx-auto mb-6 sm:mb-8"
               />
               {/* <div className="inline-flex items-center gap-2 px-3 sm:px-5 py-2 rounded-full bg-primary/5 border border-primary/10 mb-6 sm:mb-8"> */}
-                {/* <Terminal className="w-4 h-4 sm:w-5 sm:h-5 text-primary" /> */}
-                {/* <span className="font-mono text-sm sm:text-base text-primary tracking-wider">system.contact()</span> */}
+              {/* <Terminal className="w-4 h-4 sm:w-5 sm:h-5 text-primary" /> */}
+              {/* <span className="font-mono text-sm sm:text-base text-primary tracking-wider">system.contact()</span> */}
               {/* </div> */}
 
               <h2 className="font-display text-3xl sm:text-5xl md:text-6xl lg:text-7xl mb-4 sm:mb-8 tracking-tight">
@@ -571,7 +571,9 @@ const About = () => {
                 </motion.div>
 
                 <h1 className="font-display text-[clamp(2.2rem,6vw,5rem)] leading-[0.92] mb-6 sm:mb-8 tracking-tight">
-                  <span className="text-gradient-gold">GAMETOUT™</span>
+                  <span className="text-gradient-gold">
+                    GAMETOUT<sup className="text-[0.4em]">™</sup>
+                  </span>
                   <br />
                   <span className="text-foreground">Voice of Indie Games</span>
                 </h1>
@@ -822,8 +824,8 @@ const About = () => {
                   Connect with the source. Join the movement.
                 </p> */}
 
-                {/* Email Copy Button */}
-                {/* <motion.button
+        {/* Email Copy Button */}
+        {/* <motion.button
                   onClick={copyEmail}
                   whileHover={{ scale: 1.02, y: -2 }}
                   whileTap={{ scale: 0.98 }}
