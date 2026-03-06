@@ -8,7 +8,6 @@ import { Link } from "react-router-dom";
 const platformLinks = [
   { label: "Portfolios", to: "/portfolios" },
   { label: "Studios", to: "/studios" },
-  { label: "FAQ", to: "/faq" },
 ];
 
 const companyLinks = [
