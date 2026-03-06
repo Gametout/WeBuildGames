@@ -25,6 +25,9 @@ interface CreatePortfolioModalProps {
 const roles = ["Programmer", "Artist", "Designer", "Producer", "Audio", "Animator", "Community Manager", "Composer", "Level Designer", "Marketing Engineer", "Musician", "Product Manager", "QA Tester", "Project Manager", "Writer", "Sound Engineer", "Translator", "UI/UX Designer", "User Acquisation Engineer", "BizDev", "V0 Artist", "Mentor", "Founder"];
 const statusOptions = ["Open for Work", "Freelance", "Deployed"];
 
+const MAX_SHORT_DESCRIPTION = 100;
+const MAX_PROFILE_SUMMARY = 500;
+
 // Platform options with icons
 const PLATFORM_OPTIONS = [
   { value: "LinkedIn", label: "LinkedIn", icon: Linkedin, color: "#0077B5" },
@@ -317,12 +320,12 @@ export const CreatePortfolioModal = ({ isOpen, onClose, onSuccess, initialData, 
   } = useAuth();
   const { createOrUpdate, loading: isSubmitting, error: submitError, success, reset } = usePortfolioMutation();
   const [isDeleting, setIsDeleting] = useState<string | null>(null);
-  
+
   // Portfolio checking states
   const [mode, setMode] = useState<'create' | 'edit'>('create');
   const [existingPortfolio, setExistingPortfolio] = useState<PortfolioDetail | null>(null);
   const [isCheckingPortfolio, setIsCheckingPortfolio] = useState(false);
-  
+
   // Form State
   const [formData, setFormData] = useState({
     name: "",
@@ -1007,25 +1010,68 @@ export const CreatePortfolioModal = ({ isOpen, onClose, onSuccess, initialData, 
                       </div>
 
                       <div className="space-y-2 md:col-span-2">
-                        <label className="text-sm font-bold text-gray-300 uppercase">Short Description</label>
+                        <label className="text-sm font-bold text-gray-300 uppercase">
+                          Short Description <span className="text-[10px] text-gray-500 ml-2">({formData.shortDescription.length}/{MAX_SHORT_DESCRIPTION})</span>
+                        </label>
                         <input
                           type="text"
-                          maxLength={300}
-                          className="w-full bg-black/50 border border-white/20 p-3 rounded-sm text-white focus:border-[#FFAB00] focus:outline-none transition-colors font-mono"
-                          placeholder="Senior Game Programmer | Unity & Unreal Expert"
+                          maxLength={MAX_SHORT_DESCRIPTION}
+                          className={`w-full bg-black/50 border p-3 rounded-sm text-white focus:outline-none transition-colors font-mono ${formData.shortDescription.length >= MAX_SHORT_DESCRIPTION
+                            ? 'border-red-500/50 focus:border-red-500'
+                            : 'border-white/20 focus:border-[#FFAB00]'
+                            }`}
+                          placeholder="Game Designer with 8 yrs of Experience | Senior Game Programmer | Unity & Unreal Expert"
                           value={formData.shortDescription}
-                          onChange={(e) => setFormData({ ...formData, shortDescription: e.target.value })}
+                          onChange={(e) => {
+                            if (e.target.value.length <= MAX_SHORT_DESCRIPTION) {
+                              setFormData({ ...formData, shortDescription: e.target.value });
+                            }
+                          }}
                         />
+                        {formData.shortDescription.length >= MAX_SHORT_DESCRIPTION && (
+                          <p className="text-[10px] text-red-400 font-mono flex items-center gap-1">
+                            <AlertCircle className="w-3 h-3" />
+                            Maximum {MAX_SHORT_DESCRIPTION} characters reached
+                          </p>
+                        )}
                       </div>
 
                       <div className="space-y-2 md:col-span-2">
-                        <label className="text-sm font-bold text-gray-300 uppercase">Profile Summary</label>
+                        <label className="text-sm font-bold text-gray-300 uppercase">
+                          Profile Summary <span className="text-[10px] text-gray-500 ml-2">({formData.profileSummary.length}/{MAX_PROFILE_SUMMARY})</span>
+                        </label>
                         <textarea
                           rows={3}
-                          className="w-full bg-black/50 border border-white/20 p-3 rounded-sm text-white focus:border-[#FFAB00] focus:outline-none transition-colors font-mono resize-none"
+                          maxLength={MAX_PROFILE_SUMMARY}
+                          className={`w-full bg-black/50 border p-3 rounded-sm text-white focus:outline-none transition-colors font-mono resize-none ${formData.profileSummary.length >= MAX_PROFILE_SUMMARY
+                            ? 'border-red-500/50 focus:border-red-500'
+                            : 'border-white/20 focus:border-[#FFAB00]'
+                            }`}
                           placeholder="Tell us about your experience, skills, and what you're looking for..."
                           value={formData.profileSummary}
-                          onChange={(e) => setFormData({ ...formData, profileSummary: e.target.value })}
+                          onChange={(e) => {
+                            if (e.target.value.length <= MAX_PROFILE_SUMMARY) {
+                              setFormData({ ...formData, profileSummary: e.target.value });
+                            }
+                          }}
+                        />
+                        {formData.profileSummary.length >= MAX_PROFILE_SUMMARY && (
+                          <p className="text-[10px] text-red-400 font-mono flex items-center gap-1">
+                            <AlertCircle className="w-3 h-3" />
+                            Maximum {MAX_PROFILE_SUMMARY} characters reached
+                          </p>
+                        )}
+                      </div>
+                      {/* Character count progress bar for Profile Summary */}
+                      <div className="w-full h-1 bg-white/10 rounded-full overflow-hidden">
+                        <div
+                          className={`h-full transition-all duration-300 ${formData.profileSummary.length >= MAX_PROFILE_SUMMARY
+                              ? 'bg-red-500'
+                              : formData.profileSummary.length >= MAX_PROFILE_SUMMARY * 0.8
+                                ? 'bg-yellow-500'
+                                : 'bg-[#FFAB00]'
+                            }`}
+                          style={{ width: `${(formData.profileSummary.length / MAX_PROFILE_SUMMARY) * 100}%` }}
                         />
                       </div>
                     </div>
@@ -1216,41 +1262,41 @@ export const CreatePortfolioModal = ({ isOpen, onClose, onSuccess, initialData, 
                         <span className="font-mono text-sm">{submitError}</span>
                       </motion.div>
                     )}
-                    </div>
+                  </div>
 
-                    {/* Footer Actions */}
-                    <div className="flex justify-between items-center pt-4 border-t border-white/10">
-                      <button
-                        type="button"
-                        onClick={onClose}
-                        disabled={isSubmitting}
-                        className="px-6 py-3 border border-white/20 text-gray-400 font-bold uppercase tracking-widest hover:bg-white/10 hover:text-white transition-colors disabled:opacity-50"
-                      >
-                        Cancel
-                      </button>
-                      <button
-                        type="submit"
-                        disabled={isSubmitting || !formData.name || !formData.location || !formData.contactEmail}
-                        className="relative group px-8 py-3 bg-[#FFAB00] text-black font-bold uppercase tracking-widest overflow-hidden hover:bg-white transition-colors duration-100 disabled:opacity-50 disabled:cursor-not-allowed"
-                      >
-                        <span className="relative z-10 flex items-center gap-2">
-                          {isSubmitting ? (
-                            <>
-                              <div className="w-4 h-4 border-2 border-black/30 border-t-black rounded-full animate-spin" />
-                              UPLOADING...
-                            </>
-                          ) : (
-                            <>
-                              SUBMIT <Save className="w-4 h-4" />
-                            </>
-                          )}
-                        </span>
-                        {/* Glitch Overlay */}
-                        {!isSubmitting && (
-                          <div className="absolute inset-0 bg-white translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-300 ease-out opacity-50" />
+                  {/* Footer Actions */}
+                  <div className="flex justify-between items-center pt-4 border-t border-white/10">
+                    <button
+                      type="button"
+                      onClick={onClose}
+                      disabled={isSubmitting}
+                      className="px-6 py-3 border border-white/20 text-gray-400 font-bold uppercase tracking-widest hover:bg-white/10 hover:text-white transition-colors disabled:opacity-50"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      disabled={isSubmitting || !formData.name || !formData.location || !formData.contactEmail}
+                      className="relative group px-8 py-3 bg-[#FFAB00] text-black font-bold uppercase tracking-widest overflow-hidden hover:bg-white transition-colors duration-100 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      <span className="relative z-10 flex items-center gap-2">
+                        {isSubmitting ? (
+                          <>
+                            <div className="w-4 h-4 border-2 border-black/30 border-t-black rounded-full animate-spin" />
+                            UPLOADING...
+                          </>
+                        ) : (
+                          <>
+                            SUBMIT <Save className="w-4 h-4" />
+                          </>
                         )}
-                      </button>
-                    </div>
+                      </span>
+                      {/* Glitch Overlay */}
+                      {!isSubmitting && (
+                        <div className="absolute inset-0 bg-white translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-300 ease-out opacity-50" />
+                      )}
+                    </button>
+                  </div>
                 </form>
               )}
             </div>
