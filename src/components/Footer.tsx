@@ -8,10 +8,10 @@ import { Link } from "react-router-dom";
 const platformLinks = [
   { label: "Portfolios", to: "/portfolios" },
   { label: "Studios", to: "/studios" },
+  { label: "About", to: "/about" },
 ];
 
 const companyLinks = [
-  { label: "About", to: "/about" },
   { label: "Contact", to: "/about" }, // scrolls to contact section
   { label: "FAQ", to: "/faq" },
 ];
@@ -57,7 +57,7 @@ const LinkedinIcon = ({ className }: { className?: string }) => (
 const socialLinks = [
   {
     icon: <DiscordIcon className="w-5 h-5" />,
-    href: "https://discord.gg/YOUR_INVITE",
+    href: "https://discord.com/invite/7c5hD3zken",
     label: "Discord",
     hoverColor: "#7289DA",
   },
@@ -69,19 +69,19 @@ const socialLinks = [
   },
   {
     icon: <YoutubeIcon className="w-5 h-5" />,
-    href: "https://youtube.com/@YOUR_CHANNEL",
+    href: "https://www.youtube.com/@GameTout",
     label: "YouTube",
     hoverColor: "#FF0000",
   },
   {
     icon: <LinkedinIcon className="w-5 h-5" />,
-    href: "https://linkedin.com/company/YOUR_PAGE",
+    href: "https://www.linkedin.com/in/gametout/?originalSubdomain=in",
     label: "LinkedIn",
     hoverColor: "#0A66C2",
   },
   {
     icon: <InstagramIcon className="w-5 h-5" />,
-    href: "https://instagram.com/YOUR_HANDLE",
+    href: "https://www.instagram.com/game_tout",
     label: "Instagram",
     hoverColor: "#E4405F",
   },

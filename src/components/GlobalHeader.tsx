@@ -102,6 +102,67 @@ const CalendlyButton = () => {
   );
 };
 
+// --- JOIN COMMUNITY BUTTON COMPONENT ---
+const JoinCommunityButton = () => {
+  const communityUrl = "https://discord.gg/your-community"; // Replace with your community URL
+
+  return (
+    <motion.a
+      href={communityUrl}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="group relative flex items-center gap-2 bg-gradient-to-r from-[#5865F2]/20 to-[#7289DA]/20 backdrop-blur-md border border-[#5865F2]/40 px-4 py-2.5 rounded-full overflow-hidden hover:border-[#5865F2] hover:shadow-[0_0_25px_rgba(88,101,242,0.4)] transition-all duration-300"
+      whileHover={{ scale: 1.05 }}
+      whileTap={{ scale: 0.98 }}
+    >
+      {/* Animated Background Glow */}
+      <motion.div
+        className="absolute inset-0 bg-gradient-to-r from-[#5865F2]/0 via-[#5865F2]/20 to-[#5865F2]/0"
+        animate={{
+          x: ["-100%", "100%"],
+        }}
+        transition={{
+          duration: 2,
+          repeat: Infinity,
+          ease: "linear",
+        }}
+      />
+
+      {/* Pulsing Icon Container */}
+      <motion.div
+        className="relative w-6 h-6 rounded-full bg-[#5865F2] flex items-center justify-center"
+        animate={{
+          boxShadow: [
+            "0 0 0 0 rgba(88, 101, 242, 0.4)",
+            "0 0 0 8px rgba(88, 101, 242, 0)",
+          ],
+        }}
+        transition={{
+          duration: 1.5,
+          repeat: Infinity,
+          ease: "easeOut",
+        }}
+      >
+        <User className="w-3.5 h-3.5 text-white" />
+      </motion.div>
+
+      {/* Text */}
+      <span className="relative text-[10px] font-bold font-mono uppercase tracking-wider text-[#5865F2] group-hover:text-white transition-colors whitespace-nowrap">
+        Join Community
+      </span>
+
+      {/* Sparkle Animation on Hover */}
+      <motion.div
+        className="absolute -top-1 -right-1 opacity-0 group-hover:opacity-100 transition-opacity"
+        animate={{ rotate: [0, 15, -15, 0] }}
+        transition={{ duration: 0.5, repeat: Infinity }}
+      >
+        <Sparkles className="w-3 h-3 text-[#5865F2]" />
+      </motion.div>
+    </motion.a>
+  );
+};
+
 // --- ALTERNATIVE: More Minimal Calendly Button ---
 const CalendlyButtonMinimal = () => {
   const calendlyUrl = "https://calendly.com/your-username"; // Replace with your Calendly URL
@@ -491,6 +552,9 @@ export const GlobalHeader = ({ onLoginClick, isAuthenticated }: GlobalHeaderProp
 
           {/* Calendly Button - After Navigation */}
           <CalendlyButton />
+          
+          {/* Join Community Button */}
+          <JoinCommunityButton />
         </div>
 
         {/* 3. RIGHT: AUTH BUTTON (Pointer Auto) */}
@@ -702,10 +766,10 @@ export const GlobalHeader = ({ onLoginClick, isAuthenticated }: GlobalHeaderProp
 
             {/* Mobile Calendly Button */}
             <motion.a
-              href="https://calendly.com/your-username"
+              href="https://calendly.com/thegametout/connect"
               target="_blank"
               rel="noopener noreferrer"
-              className="w-full py-4 mb-4 bg-gradient-to-r from-[#FFAB00]/20 to-[#FF6B00]/20 border border-[#FFAB00]/40 flex items-center justify-center gap-3 rounded-lg"
+              className="w-full py-4 mb-2 bg-gradient-to-r from-[#FFAB00]/20 to-[#FF6B00]/20 border border-[#FFAB00]/40 flex items-center justify-center gap-3 rounded-lg"
               whileTap={{ scale: 0.98 }}
             >
               <motion.div
@@ -722,6 +786,31 @@ export const GlobalHeader = ({ onLoginClick, isAuthenticated }: GlobalHeaderProp
               </motion.div>
               <span className="font-display text-lg text-[#FFAB00] uppercase tracking-wider">
                 Schedule a Meeting
+              </span>
+            </motion.a>
+
+            {/* Mobile Join Community Button */}
+            <motion.a
+              href="https://discord.gg/your-community"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-full py-4 mb-4 bg-gradient-to-r from-[#5865F2]/20 to-[#7289DA]/20 border border-[#5865F2]/40 flex items-center justify-center gap-3 rounded-lg"
+              whileTap={{ scale: 0.98 }}
+            >
+              <motion.div
+                animate={{
+                  boxShadow: [
+                    "0 0 0 0 rgba(88, 101, 242, 0.4)",
+                    "0 0 0 6px rgba(88, 101, 242, 0)",
+                  ],
+                }}
+                transition={{ duration: 1.5, repeat: Infinity }}
+                className="w-8 h-8 rounded-full bg-[#5865F2] flex items-center justify-center"
+              >
+                <User className="w-4 h-4 text-white" />
+              </motion.div>
+              <span className="font-display text-lg text-[#5865F2] uppercase tracking-wider">
+                Join Community
               </span>
             </motion.a>
 
