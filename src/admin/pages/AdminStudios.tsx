@@ -4,8 +4,9 @@ import {
   Building2, Plus, Search, Filter, Trash2, Edit, 
   MapPin, Users, Star, ExternalLink, ChevronLeft, 
   ChevronRight, Loader2, AlertCircle, CheckCircle,
-  RefreshCw, Globe, MoreVertical, Upload, FileJson, X,
-  Clock, Check, XCircle, Shield
+  RefreshCw, Globe, Upload, FileJson, X,
+  Clock, Check, XCircle, Shield, Mail, Phone, 
+  Youtube, Linkedin, Twitter, Zap, Briefcase
 } from "lucide-react";
 import { PageTransition } from "@/components/PageTransition";
 import { StudioFormModal } from "@/components/StudioFormModal";
@@ -754,6 +755,28 @@ export default function AdminStudios() {
                             </div>
                           </div>
 
+                          {/* Status Badges */}
+                          <div className="flex flex-wrap gap-2 mb-4">
+                            {studio.hiringStatus && (
+                              <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-bold uppercase ${
+                                studio.hiringStatus === "HIRING" 
+                                  ? "bg-green-500/20 text-green-400 border border-green-500/30" 
+                                  : studio.hiringStatus === "OPEN_TO_HIRE"
+                                    ? "bg-yellow-500/20 text-yellow-400 border border-yellow-500/30"
+                                    : "bg-gray-500/20 text-gray-400 border border-gray-500/30"
+                              }`}>
+                                <Zap className="w-3 h-3" />
+                                {studio.hiringStatus === "HIRING" ? "Hiring" : studio.hiringStatus === "OPEN_TO_HIRE" ? "Open to Hire" : "Not Hiring"}
+                              </span>
+                            )}
+                            {studio.category && (
+                              <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-bold uppercase bg-[#FFAB00]/20 text-[#FFAB00] border border-[#FFAB00]/30">
+                                <Briefcase className="w-3 h-3" />
+                                {studio.category === "PRODUCT_BASED" ? "Product/IP" : "Service"}
+                              </span>
+                            )}
+                          </div>
+
                           {/* Description */}
                           {(studio.studioDescription || studio.description) && (
                             <p className="text-sm text-gray-400 mb-4 line-clamp-2">
@@ -780,6 +803,82 @@ export default function AdminStudios() {
                               ))}
                             </span>
                           </div>
+
+                          {/* Contact Info */}
+                          {(studio.studioEmail || studio.studioMobile) && (
+                            <div className="flex flex-wrap gap-2 mb-4">
+                              {studio.studioEmail && (
+                                <a 
+                                  href={`mailto:${studio.studioEmail}`}
+                                  className="inline-flex items-center gap-1 px-2 py-1 rounded bg-white/5 border border-white/10 text-xs text-gray-400 hover:text-white hover:border-[#FFAB00]/30 transition-colors"
+                                >
+                                  <Mail className="w-3 h-3" />
+                                  {studio.studioEmail}
+                                </a>
+                              )}
+                              {studio.studioMobile && (
+                                <a 
+                                  href={`tel:${studio.studioMobile}`}
+                                  className="inline-flex items-center gap-1 px-2 py-1 rounded bg-white/5 border border-white/10 text-xs text-gray-400 hover:text-white hover:border-[#FFAB00]/30 transition-colors"
+                                >
+                                  <Phone className="w-3 h-3" />
+                                  {studio.studioMobile}
+                                </a>
+                              )}
+                            </div>
+                          )}
+
+                          {/* Social Links */}
+                          {(studio.youtubeUrl || studio.linkedinUrl || studio.twitterUrl || studio.discordUrl) && (
+                            <div className="flex flex-wrap gap-2 mb-4">
+                              {studio.youtubeUrl && (
+                                <a
+                                  href={studio.youtubeUrl}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="p-1.5 rounded bg-red-500/10 border border-red-500/30 text-red-400 hover:bg-red-500/20 transition-colors"
+                                  title="YouTube"
+                                >
+                                  <Youtube className="w-3.5 h-3.5" />
+                                </a>
+                              )}
+                              {studio.linkedinUrl && (
+                                <a
+                                  href={studio.linkedinUrl}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="p-1.5 rounded bg-blue-500/10 border border-blue-500/30 text-blue-400 hover:bg-blue-500/20 transition-colors"
+                                  title="LinkedIn"
+                                >
+                                  <Linkedin className="w-3.5 h-3.5" />
+                                </a>
+                              )}
+                              {studio.twitterUrl && (
+                                <a
+                                  href={studio.twitterUrl}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="p-1.5 rounded bg-sky-500/10 border border-sky-500/30 text-sky-400 hover:bg-sky-500/20 transition-colors"
+                                  title="Twitter"
+                                >
+                                  <Twitter className="w-3.5 h-3.5" />
+                                </a>
+                              )}
+                              {studio.discordUrl && (
+                                <a
+                                  href={studio.discordUrl}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="p-1.5 rounded bg-indigo-500/10 border border-indigo-500/30 text-indigo-400 hover:bg-indigo-500/20 transition-colors"
+                                  title="Discord"
+                                >
+                                  <svg viewBox="0 0 24 24" fill="currentColor" className="w-3.5 h-3.5">
+                                    <path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z" />
+                                  </svg>
+                                </a>
+                              )}
+                            </div>
+                          )}
 
                           {/* Action Buttons */}
                           <div className="flex gap-3">

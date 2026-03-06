@@ -2,8 +2,8 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   MapPin, Users, ExternalLink, Star, Building, Loader2, AlertCircle,
-  Filter, Plus, Search, XCircle, Grid, List, Zap, Globe, ChevronDown,
-  Terminal, Wifi, Radio
+  Filter, Plus, Search, XCircle, Grid, Zap, Globe,
+  Terminal, Mail, Phone, Youtube, Linkedin, Twitter, Briefcase, LogIn
 } from "lucide-react";
 import { PageTransition, FadeInView } from "@/components/PageTransition";
 import { Footer } from "@/components/Footer";
@@ -327,21 +327,31 @@ const Studios = () => {
               </div>
             </div>
 
-            {/* Right: Submit CTA */}
-            <motion.button
-              whileHover={{ scale: 1.03 }}
-              whileTap={{ scale: 0.97 }}
-              onClick={() => setIsSubmitModalOpen(true)}
-              className="group relative flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-[#FFAB00] to-[#FF8C00] text-black font-bold uppercase text-xs tracking-wide overflow-hidden rounded-sm shadow-[0_0_20px_rgba(255,171,0,0.3)] hover:shadow-[0_0_30px_rgba(255,171,0,0.5)] transition-shadow"
-            >
-              <Plus className="w-4 h-4" />
-              <span>Submit Studio</span>
-              <motion.div
-                className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full"
-                animate={{ translateX: ["-100%", "200%"] }}
-                transition={{ duration: 2, repeat: Infinity, repeatDelay: 3 }}
-              />
-            </motion.button>
+            {/* Right: Submit CTA - Auth Protected */}
+            {isAuthenticated ? (
+              <motion.button
+                whileHover={{ scale: 1.03 }}
+                whileTap={{ scale: 0.97 }}
+                onClick={() => setIsSubmitModalOpen(true)}
+                className="group relative flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-[#FFAB00] to-[#FF8C00] text-black font-bold uppercase text-xs tracking-wide overflow-hidden rounded-sm shadow-[0_0_20px_rgba(255,171,0,0.3)] hover:shadow-[0_0_30px_rgba(255,171,0,0.5)] transition-shadow"
+              >
+                <Plus className="w-4 h-4" />
+                <span>Submit Studio</span>
+                <motion.div
+                  className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full"
+                  animate={{ translateX: ["-100%", "200%"] }}
+                  transition={{ duration: 2, repeat: Infinity, repeatDelay: 3 }}
+                />
+              </motion.button>
+            ) : (
+              <a
+                href="/login"
+                className="group relative flex items-center gap-2 px-4 py-2 bg-white/10 border border-white/20 text-white font-bold uppercase text-xs tracking-wide overflow-hidden rounded-sm hover:border-[#FFAB00]/50 hover:bg-white/5 transition-all"
+              >
+                <LogIn className="w-4 h-4" />
+                <span>Login to Submit</span>
+              </a>
+            )}
           </div>
 
           {/* Tagline */}
@@ -587,7 +597,7 @@ const Studios = () => {
               <>
                 <SheetHeader>
                   <div className="flex items-center gap-4 mb-4">
-                    <div className="w-16 h-16 rounded-lg overflow-hidden bg-white/5 flex-shrink-0 border border-white/10">
+                    <div className="relative w-16 h-16 rounded-lg overflow-hidden bg-white/5 flex-shrink-0 border border-white/10">
                       {selectedStudio.studioLogoUrl ? (
                         <img
                           src={selectedStudio.studioLogoUrl}
@@ -597,6 +607,16 @@ const Studios = () => {
                       ) : (
                         <div className="w-full h-full flex items-center justify-center">
                           <Building className="w-8 h-8 text-gray-600" />
+                        </div>
+                      )}
+                      {/* Hiring Status Indicator */}
+                      {selectedStudio.hiringStatus && selectedStudio.hiringStatus !== "NOT_HIRING" && (
+                        <div className={`absolute -top-1 -right-1 w-4 h-4 rounded-full border-2 border-[#0a0a0a] ${
+                          selectedStudio.hiringStatus === "HIRING" ? "bg-green-500" : "bg-yellow-500"
+                        }`}>
+                          <span className="absolute inset-0 rounded-full animate-ping opacity-50" 
+                            style={{ backgroundColor: selectedStudio.hiringStatus === "HIRING" ? "#22c55e" : "#eab308" }} 
+                          />
                         </div>
                       )}
                     </div>
@@ -609,6 +629,28 @@ const Studios = () => {
                         {selectedStudio.city}, {selectedStudio.country}
                       </SheetDescription>
                     </div>
+                  </div>
+
+                  {/* Status Badges */}
+                  <div className="flex flex-wrap gap-2 mt-2">
+                    {selectedStudio.hiringStatus && (
+                      <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-bold uppercase ${
+                        selectedStudio.hiringStatus === "HIRING" 
+                          ? "bg-green-500/20 text-green-400 border border-green-500/30" 
+                          : selectedStudio.hiringStatus === "OPEN_TO_HIRE"
+                            ? "bg-yellow-500/20 text-yellow-400 border border-yellow-500/30"
+                            : "bg-gray-500/20 text-gray-400 border border-gray-500/30"
+                      }`}>
+                        <Zap className="w-3 h-3" />
+                        {selectedStudio.hiringStatus === "HIRING" ? "Hiring" : selectedStudio.hiringStatus === "OPEN_TO_HIRE" ? "Open to Hire" : "Not Hiring"}
+                      </span>
+                    )}
+                    {selectedStudio.category && (
+                      <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-bold uppercase bg-[#FFAB00]/20 text-[#FFAB00] border border-[#FFAB00]/30">
+                        <Briefcase className="w-3 h-3" />
+                        {selectedStudio.category === "PRODUCT_BASED" ? "Product/IP" : "Service"}
+                      </span>
+                    )}
                   </div>
                 </SheetHeader>
 
@@ -644,6 +686,88 @@ const Studios = () => {
                       <p className="text-sm font-medium text-white">{selectedStudio.city}</p>
                     </div>
                   </div>
+
+                  {/* Contact Info */}
+                  {(selectedStudio.studioEmail || selectedStudio.studioMobile) && (
+                    <div>
+                      <h4 className="font-display text-base text-white mb-3">Contact</h4>
+                      <div className="space-y-2">
+                        {selectedStudio.studioEmail && (
+                          <a 
+                            href={`mailto:${selectedStudio.studioEmail}`}
+                            className="flex items-center gap-2 p-3 rounded-lg bg-white/5 border border-white/10 hover:border-[#FFAB00]/30 transition-colors group"
+                          >
+                            <Mail className="w-4 h-4 text-[#FFAB00]" />
+                            <span className="text-sm text-gray-400 group-hover:text-white transition-colors">{selectedStudio.studioEmail}</span>
+                          </a>
+                        )}
+                        {selectedStudio.studioMobile && (
+                          <a 
+                            href={`tel:${selectedStudio.studioMobile}`}
+                            className="flex items-center gap-2 p-3 rounded-lg bg-white/5 border border-white/10 hover:border-[#FFAB00]/30 transition-colors group"
+                          >
+                            <Phone className="w-4 h-4 text-[#FFAB00]" />
+                            <span className="text-sm text-gray-400 group-hover:text-white transition-colors">{selectedStudio.studioMobile}</span>
+                          </a>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Social Links */}
+                  {(selectedStudio.youtubeUrl || selectedStudio.linkedinUrl || selectedStudio.twitterUrl || selectedStudio.discordUrl) && (
+                    <div>
+                      <h4 className="font-display text-base text-white mb-3">Social</h4>
+                      <div className="flex flex-wrap gap-2">
+                        {selectedStudio.youtubeUrl && (
+                          <a
+                            href={selectedStudio.youtubeUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center gap-2 px-3 py-2 rounded-lg bg-red-500/10 border border-red-500/30 text-red-400 hover:bg-red-500/20 transition-colors"
+                          >
+                            <Youtube className="w-4 h-4" />
+                            <span className="text-xs font-medium">YouTube</span>
+                          </a>
+                        )}
+                        {selectedStudio.linkedinUrl && (
+                          <a
+                            href={selectedStudio.linkedinUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center gap-2 px-3 py-2 rounded-lg bg-blue-500/10 border border-blue-500/30 text-blue-400 hover:bg-blue-500/20 transition-colors"
+                          >
+                            <Linkedin className="w-4 h-4" />
+                            <span className="text-xs font-medium">LinkedIn</span>
+                          </a>
+                        )}
+                        {selectedStudio.twitterUrl && (
+                          <a
+                            href={selectedStudio.twitterUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center gap-2 px-3 py-2 rounded-lg bg-sky-500/10 border border-sky-500/30 text-sky-400 hover:bg-sky-500/20 transition-colors"
+                          >
+                            <Twitter className="w-4 h-4" />
+                            <span className="text-xs font-medium">Twitter</span>
+                          </a>
+                        )}
+                        {selectedStudio.discordUrl && (
+                          <a
+                            href={selectedStudio.discordUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center gap-2 px-3 py-2 rounded-lg bg-indigo-500/10 border border-indigo-500/30 text-indigo-400 hover:bg-indigo-500/20 transition-colors"
+                          >
+                            <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
+                              <path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z" />
+                            </svg>
+                            <span className="text-xs font-medium">Discord</span>
+                          </a>
+                        )}
+                      </div>
+                    </div>
+                  )}
 
                   {/* CTA */}
                   {selectedStudio.studioWebsiteUrl && (
