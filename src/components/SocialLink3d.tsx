@@ -8,24 +8,24 @@ import {
 
 // Enhanced Social Data with descriptions and stats
 const socials = [
-  { 
-    icon: Twitter, 
-    label: "Twitter", 
-    handle: "@IndieGameDev",
-    url: "#",
-    color: "#1DA1F2",
-    gradient: "from-[#1DA1F2] to-[#0C85D0]",
-    description: "Hot takes & dev logs",
-    fullDescription: "Daily game dev insights, industry news, and behind-the-scenes content",
-    stat: "25K+",
-    statLabel: "Followers",
-    badge: "Active"
-  },
+  // { 
+  //   icon: Twitter, 
+  //   label: "Twitter", 
+  //   handle: "@IndieGameDev",
+  //   url: "#",
+  //   color: "#1DA1F2",
+  //   gradient: "from-[#1DA1F2] to-[#0C85D0]",
+  //   description: "Hot takes & dev logs",
+  //   fullDescription: "Daily game dev insights, industry news, and behind-the-scenes content",
+  //   stat: "25K+",
+  //   statLabel: "Followers",
+  //   badge: "Active"
+  // },
   { 
     icon: Linkedin, 
     label: "LinkedIn", 
     handle: "/company/gamedev",
-    url: "#",
+    url: "https://www.linkedin.com/in/gametout/",
     color: "#0077B5",
     gradient: "from-[#0077B5] to-[#005885]",
     description: "Career & networking",
@@ -60,19 +60,19 @@ const socials = [
     statLabel: "Followers",
     badge: "New Post"
   },
-  { 
-    icon: Facebook, 
-    label: "Facebook", 
-    handle: "/GameDevCommunity",
-    url: "#",
-    color: "#1877F2",
-    gradient: "from-[#1877F2] to-[#0C5DC7]",
-    description: "Community hub",
-    fullDescription: "Join discussions, events, and connect with fellow developers",
-    stat: "30K+",
-    statLabel: "Members",
-    badge: "Community"
-  },
+  // { 
+  //   icon: Facebook, 
+  //   label: "Facebook", 
+  //   handle: "/GameDevCommunity",
+  //   url: "#",
+  //   color: "#1877F2",
+  //   gradient: "from-[#1877F2] to-[#0C5DC7]",
+  //   description: "Community hub",
+  //   fullDescription: "Join discussions, events, and connect with fellow developers",
+  //   stat: "30K+",
+  //   statLabel: "Members",
+  //   badge: "Community"
+  // },
 ];
 
 // ============================================
@@ -132,7 +132,7 @@ export const SocialLink3D = () => {
         transition={{ delay: 2.5 }}
       >
         <p className="text-xs text-gray-500 font-mono">
-          <span className="text-[#FFAB00]">▸</span> Click any platform to see what awaits you
+          <span className="text-[#FFAB00]">▸</span> Social Handles to connect GameTout™
         </p>
       </motion.div>
     </div>

@@ -3,15 +3,15 @@ import { Twitter, Instagram, Youtube, Linkedin, Send } from "lucide-react";
 import { useState } from "react";
 
 const socialLinks = [
-  { icon: Twitter, href: "#", label: "Twitter" },
+  // { icon: Twitter, href: "#", label: "Twitter" },
   { icon: Instagram, href: "#", label: "Instagram" },
   { icon: Youtube, href: "#", label: "YouTube" },
   { icon: Linkedin, href: "#", label: "LinkedIn" },
 ];
 
 const footerLinks = {
-  platform: [/*"Featured", "Documentary", "Reviews",*/ "Portfolios", "Studios"],
-  company: ["About Us","FAQs"],
+  platform: [/*"Featured", "Documentary", "Reviews",*/ "Portfolios", "Studios", "DIscord", "LinkedIn"],
+  company: ["About Us", "FAQs"],
   community: ["Discord", "Whatsapp", "Youtube", "Linkedin"],
 };
 
@@ -24,14 +24,14 @@ export const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12 mb-12">
           {/* Brand */}
           <div className="lg:col-span-2">
-            <h3 className="font-display text-3xl mb-4">
-              <span className="text-gradient-gold">GAME</span>TOUT<span className="text-[0.5em] align-super font-bold text-white/90"> ™</span>
+            <h3 className="font-display text-[1.7rem] mb-4">
+              WE<span className="text-gradient-gold">BUILD</span>GAME
+              {/* <span className="text-[0.5em] align-super font-bold text-white/90"> ™</span> */}
             </h3>
             <p className="text-muted-foreground text-sm mb-6 max-w-sm">
-              India's premier gaming hub. Cinematic stories, expert reviews, 
-              and a professional network for game developers.
+              The Professional hub connecting game developers and studios worldwide.
             </p>
-            
+
             {/* Newsletter */}
             {/* <div className="flex gap-2">
               <input
@@ -49,7 +49,7 @@ export const Footer = () => {
 
           {/* Links */}
           <div>
-            <h4 className="font-display text-lg mb-4">Platform</h4>
+            {/* <h4 className="font-display text-lg mb-4">Platform</h4> */}
             <ul className="space-y-2">
               {footerLinks.platform.map((link) => (
                 <li key={link}>
@@ -62,7 +62,7 @@ export const Footer = () => {
           </div>
 
           <div>
-            <h4 className="font-display text-lg mb-4">Company</h4>
+            {/* <h4 className="font-display text-lg mb-4">Company</h4> */}
             <ul className="space-y-2">
               {footerLinks.company.map((link) => (
                 <li key={link}>
@@ -74,7 +74,7 @@ export const Footer = () => {
             </ul>
           </div>
 
-          <div>
+          {/* <div>
             <h4 className="font-display text-lg mb-4">Community</h4>
             <ul className="space-y-2">
               {footerLinks.community.map((link) => (
@@ -85,7 +85,7 @@ export const Footer = () => {
                 </li>
               ))}
             </ul>
-          </div>
+          </div> */}
         </div>
 
         {/* Bottom */}
@@ -93,7 +93,7 @@ export const Footer = () => {
           <p className="text-xs text-muted-foreground">
             © {new Date().getFullYear()} GameTout. All rights reserved.
           </p>
-          
+
           <div className="flex items-center gap-4">
             {socialLinks.map((social) => (
               <motion.a

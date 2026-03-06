@@ -35,7 +35,7 @@ const PLATFORM_OPTIONS = [
   { value: "ArtStation", label: "ArtStation", icon: ExternalLink, color: "#13AFF0" },
   { value: "Behance", label: "Behance", icon: ExternalLink, color: "#0057FF" },
   { value: "YouTube", label: "YouTube", icon: Youtube, color: "#FF0000" },
-  { value: "Itch.io", label: "Itch.io", icon: ExternalLink, color: "#FA5C5C" },
+  { value: "Website", label: "Website", icon: ExternalLink, color: "#FA5C5C" },
 ];
 
 // Custom Platform Dropdown Component (similar to createpost)
@@ -892,7 +892,7 @@ export const CreatePortfolioModal = ({ isOpen, onClose, onSuccess, initialData, 
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <div className="space-y-2">
-                        <label className="text-sm font-bold text-gray-300 uppercase">Operative Name *</label>
+                        <label className="text-sm font-bold text-gray-300 uppercase">Candidate Name *</label>
                         <input
                           type="text"
                           required
@@ -904,7 +904,7 @@ export const CreatePortfolioModal = ({ isOpen, onClose, onSuccess, initialData, 
                       </div>
 
                       <div className="space-y-2">
-                        <label className="text-sm font-bold text-gray-300 uppercase">Class (Role) *</label>
+                        <label className="text-sm font-bold text-gray-300 uppercase">Category (Role) *</label>
                         <RoleDropdown
                           value={formData.role}
                           onChange={(value) => setFormData({ ...formData, role: value })}

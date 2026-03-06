@@ -161,17 +161,17 @@ const ContactSection = () => {
                 transition={{ duration: 0.8 }}
                 className="h-[2px] bg-primary mx-auto mb-6 sm:mb-8"
               />
-              <div className="inline-flex items-center gap-2 px-3 sm:px-5 py-2 rounded-full bg-primary/5 border border-primary/10 mb-6 sm:mb-8">
-                <Terminal className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
-                <span className="font-mono text-sm sm:text-base text-primary tracking-wider">system.contact()</span>
-              </div>
+              {/* <div className="inline-flex items-center gap-2 px-3 sm:px-5 py-2 rounded-full bg-primary/5 border border-primary/10 mb-6 sm:mb-8"> */}
+                {/* <Terminal className="w-4 h-4 sm:w-5 sm:h-5 text-primary" /> */}
+                {/* <span className="font-mono text-sm sm:text-base text-primary tracking-wider">system.contact()</span> */}
+              {/* </div> */}
 
               <h2 className="font-display text-3xl sm:text-5xl md:text-6xl lg:text-7xl mb-4 sm:mb-8 tracking-tight">
                 <TypewriterText text="GET IN TOUCH" delay={300} speed={80} />
               </h2>
 
               <p className="text-foreground/70 max-w-lg mx-auto text-base sm:text-lg md:text-xl leading-relaxed px-2">
-                <span className="text-primary font-bold">{">"}</span> Ready to collaborate? Drop a line and we'll respond within 24 hours.
+                <span className="text-primary font-bold">{">"}</span>Drop your queries and we'll respond within 24 hours.
               </p>
             </div>
           </FadeInView>
@@ -458,7 +458,7 @@ const stats = [
   { label: "Documentaries", value: "30+" },
 ];
 
-const roles = ["Video Game Journalist", "Documentary Maker", "Steam Curator", "Community Builder"];
+// const roles = ["Video Game Journalist", "Documentary Maker", "Steam Curator", "Community Builder"];
 
 const milestones = [
   { year: "The Beginning", title: "GameTout™ Channel Launch", description: "Started covering the Indian game development scene with honest, ground-level reporting." },
@@ -531,7 +531,7 @@ const About = () => {
                     className="absolute -top-3 -right-2 sm:-top-4 sm:-right-4 z-20 px-3 py-1.5 sm:px-4 sm:py-2 bg-destructive/90 font-display text-sm sm:text-lg text-destructive-foreground uppercase tracking-widest rounded-sm"
                     style={{ boxShadow: "3px 3px 0 hsl(0 0% 0% / 0.4)" }}
                   >
-                    Classified
+                    Founder
                   </motion.div>
 
                   <div className="aspect-[3/4]">
@@ -541,7 +541,7 @@ const About = () => {
                     />
                   </div>
 
-                  <div className="flex flex-wrap gap-2 sm:gap-2.5 mt-6 sm:mt-8 justify-center lg:justify-start">
+                  {/* <div className="flex flex-wrap gap-2 sm:gap-2.5 mt-6 sm:mt-8 justify-center lg:justify-start">
                     {roles.map((role, index) => (
                       <motion.span
                         key={role}
@@ -553,7 +553,7 @@ const About = () => {
                         {role}
                       </motion.span>
                     ))}
-                  </div>
+                  </div> */}
                 </div>
               </FadeInView>
 
@@ -566,19 +566,19 @@ const About = () => {
                   className="mb-4 sm:mb-6"
                 >
                   <span className="font-mono text-xs sm:text-sm text-foreground/50 uppercase tracking-[0.2em] sm:tracking-[0.3em]">
-                    // Subject Dossier
+                    // An Initiative by
                   </span>
                 </motion.div>
 
                 <h1 className="font-display text-[clamp(2.2rem,6vw,5rem)] leading-[0.92] mb-6 sm:mb-8 tracking-tight">
-                  <span className="text-gradient-gold">The Voice</span>
+                  <span className="text-gradient-gold">GAMETOUT™</span>
                   <br />
-                  <span className="text-foreground">of Indian Gaming</span>
+                  <span className="text-foreground">Voice of Indie Games</span>
                 </h1>
 
                 <div className="mb-8 sm:mb-10">
                   <TypewriterText
-                    text="Upfront. Unfiltered. Ground-level coverage of the Indian Game Development scene and beyond."
+                    text="The Website is founded and managed by GameTout™"
                     className="text-base sm:text-lg md:text-xl text-foreground/70 leading-relaxed"
                     speed={30}
                     delay={500}

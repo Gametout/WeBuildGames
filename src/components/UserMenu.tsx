@@ -98,7 +98,7 @@ export function UserMenu({ isAuthenticated }: UserMenuProps) {
 
         {/* Status Text */}
         <span className="hidden md:block font-display text-sm font-bold text-white uppercase leading-none tracking-wider group-hover:text-[#FFAB00] transition-colors">
-          ONLINE
+          I'M IN
         </span>
 
         {/* Chevron Indicator */}

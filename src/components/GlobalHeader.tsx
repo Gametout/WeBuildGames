@@ -182,9 +182,8 @@ export const GlobalHeader = ({ onLoginClick, isAuthenticated }: GlobalHeaderProp
 
           {/* Brand Logo - NOW LARGER */}
           <Link to="/" className="flex flex-col group relative z-50 flex-shrink-0">
-            <h1 className="font-display text-3xl md:text-5xl font-bold uppercase text-white leading-none tracking-normal group-hover:text-[#FFAB00] transition-colors drop-shadow-xl">
-              Game<span className="text-[#FFAB00] group-hover:text-white transition-colors">Tout</span>
-              <span className="text-[0.5em] align-super font-bold text-white/90"> ™</span>
+            <h1 className="font-display text-[1.4rem] md:text-[2.2rem] font-bold uppercase text-white leading-none tracking-tight group-hover:text-[#FFAB00] transition-colors drop-shadow-xl">
+              We<span className="text-[#FFAB00] group-hover:text-white transition-colors">Build</span>Game
             </h1>
           </Link>
         </div>
@@ -388,9 +387,9 @@ export const GlobalHeader = ({ onLoginClick, isAuthenticated }: GlobalHeaderProp
                     }`}
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.98 }} */}
-                {/* > */}
-                  {/* Animated Background Glow */}
-                  {/* <motion.div
+          {/* > */}
+          {/* Animated Background Glow */}
+          {/* <motion.div
                     className={`absolute inset-0 bg-gradient-to-r ${subscriptionType === "CREATOR"
                       ? "from-purple-500/0 via-purple-500/20 to-purple-500/0"
                       : "from-blue-500/0 via-blue-500/20 to-blue-500/0"
@@ -405,8 +404,8 @@ export const GlobalHeader = ({ onLoginClick, isAuthenticated }: GlobalHeaderProp
                     }}
                   /> */}
 
-                  {/* Pulsing Icon Container */}
-                  {/* <motion.div
+          {/* Pulsing Icon Container */}
+          {/* <motion.div
                     className={`relative w-6 h-6 rounded-full flex items-center justify-center ${subscriptionType === "CREATOR" ? "bg-purple-500" : "bg-blue-500"
                       }`}
                     animate={{
@@ -433,16 +432,16 @@ export const GlobalHeader = ({ onLoginClick, isAuthenticated }: GlobalHeaderProp
                     )}
                   </motion.div> */}
 
-                  {/* Text */}
-                  {/* <span className={`relative text-[10px] font-bold font-mono uppercase tracking-wider transition-colors whitespace-nowrap ${subscriptionType === "CREATOR"
+          {/* Text */}
+          {/* <span className={`relative text-[10px] font-bold font-mono uppercase tracking-wider transition-colors whitespace-nowrap ${subscriptionType === "CREATOR"
                     ? "text-purple-400 group-hover:text-white"
                     : "text-blue-400 group-hover:text-white"
                     }`}>
                     {subscriptionType === "CREATOR" ? "Elite Creator" : "Elite Viewer"}
                   </span> */}
 
-                  {/* Crown Icon */}
-                  {/* <Crown className={`w-3 h-3 ${subscriptionType === "CREATOR" ? "text-purple-400" : "text-blue-400"
+          {/* Crown Icon */}
+          {/* <Crown className={`w-3 h-3 ${subscriptionType === "CREATOR" ? "text-purple-400" : "text-blue-400"
                     }`} />
                 </motion.div>
               </motion.div>
@@ -463,8 +462,8 @@ export const GlobalHeader = ({ onLoginClick, isAuthenticated }: GlobalHeaderProp
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.98 }}
                 > */}
-                  {/* Animated Background Glow */}
-                  {/* <motion.div
+          {/* Animated Background Glow */}
+          {/* <motion.div
                     className="absolute inset-0 bg-gradient-to-r from-green-500/0 via-green-500/20 to-green-500/0"
                     animate={{
                       x: ["-100%", "100%"],
@@ -476,18 +475,18 @@ export const GlobalHeader = ({ onLoginClick, isAuthenticated }: GlobalHeaderProp
                     }}
                   /> */}
 
-                  {/* Icon Container */}
-                  {/* <div className="relative w-6 h-6 rounded-full bg-green-500 flex items-center justify-center">
+          {/* Icon Container */}
+          {/* <div className="relative w-6 h-6 rounded-full bg-green-500 flex items-center justify-center">
                     <User className="w-3.5 h-3.5 text-white" />
                   </div>
 
                   {/* Text */}
-                  {/* <span className="relative text-[10px] font-bold font-mono uppercase tracking-wider text-green-400 group-hover:text-white transition-colors whitespace-nowrap">
+          {/* <span className="relative text-[10px] font-bold font-mono uppercase tracking-wider text-green-400 group-hover:text-white transition-colors whitespace-nowrap">
                     Member
                   </span>
                 </motion.div>
               </motion.div> */}
-            {/* )} */}
+          {/* )} */}
           {/* </AnimatePresence> */}
 
           {/* Calendly Button - After Navigation */}
