@@ -81,10 +81,21 @@ export function usePortfolios(options: UsePortfoliosOptions = {}): UsePortfolios
 
       try {
         // If no filters selected, use listAll
-        const hasFilters = filters.categories.length > 0 || filters.statuses.length > 0;
+        const hasCategories = filters.categories.length > 0;
+        const hasStatuses = filters.statuses.length > 0;
+        const hasFilters = hasCategories || hasStatuses;
+        
+        // When categories are selected but statuses are empty, default to OPEN
+        // This prevents 400 errors from backend expecting at least one status
+        const effectiveFilters: PortfolioFilters = {
+          categories: filters.categories,
+          statuses: (hasCategories && !hasStatuses) 
+            ? [JobProfileStatus.OPEN] 
+            : filters.statuses,
+        };
         
         const response = hasFilters
-          ? await portfolioService.listByFilters(filters, page, pageSize)
+          ? await portfolioService.listByFilters(effectiveFilters, page, pageSize)
           : await portfolioService.listAll(page, pageSize);
         
         const newPortfolios = response.content;

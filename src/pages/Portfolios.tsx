@@ -475,7 +475,7 @@ const MoreCategoriesButton = ({
 const Portfolios = () => {
   // Multi-filter state (replaces single activeRole)
   const [activeCategories, setActiveCategories] = useState<string[]>([]);
-  const [activeStatuses, setActiveStatuses] = useState<JobProfileStatus[]>([JobProfileStatus.OPEN]);
+  const [activeStatuses, setActiveStatuses] = useState<JobProfileStatus[]>([]);
 
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -619,6 +619,7 @@ const Portfolios = () => {
   };
 
   // Toggle category selection (multi-select)
+  // Toggle category selection (multi-select)
   const handleCategoryToggle = (category: string) => {
     clearSearch();
     setActiveCategories(prev => {
@@ -627,26 +628,50 @@ const Portfolios = () => {
         ? prev.filter(c => c !== category)
         : [...prev, category];
 
+      // Determine new statuses based on categories
+      let newStatuses = activeStatuses;
+
+      if (newCategories.length === 0) {
+        // If going back to ALL (no categories), clear all statuses
+        newStatuses = [];
+        setActiveStatuses([]);
+      } else if (prev.length === 0 && newCategories.length > 0) {
+        // If moving from ALL to first category, set default status to OPEN
+        newStatuses = [JobProfileStatus.OPEN];
+        setActiveStatuses([JobProfileStatus.OPEN]);
+      }
+
       // Trigger fetch with new filters
       if (!isDemoMode) {
-        fetchWithFilters({ categories: newCategories, statuses: activeStatuses }, 0);
+        fetchWithFilters({
+          categories: newCategories,
+          statuses: newStatuses
+        }, 0);
       }
       return newCategories;
     });
   };
 
   // Toggle status selection (multi-select)
+  // Toggle status selection (multi-select)
   const handleStatusToggle = (status: JobProfileStatus) => {
+    // If "ALL" is selected (no active categories), don't allow status selection
+    if (activeCategories.length === 0) {
+      toast.info("Select a category first to filter by status");
+      return;
+    }
+
     clearSearch();
     setActiveStatuses(prev => {
       const isSelected = prev.includes(status);
       let newStatuses: JobProfileStatus[];
 
       if (isSelected) {
-        // Don't allow deselecting if it's the last one — fallback to OPEN
-        const remaining = prev.filter(s => s !== status);
-        newStatuses = remaining.length > 0 ? remaining : [JobProfileStatus.OPEN];
+        // Remove the status
+        newStatuses = prev.filter(s => s !== status);
+        // If removing the last status, don't auto-select anything
       } else {
+        // Add the status
         newStatuses = [...prev, status];
       }
 
@@ -660,18 +685,15 @@ const Portfolios = () => {
   // Clear all filters
   const clearAllFilters = () => {
     setActiveCategories([]);
-    setActiveStatuses([JobProfileStatus.OPEN]); // Reset to default, not empty
+    setActiveStatuses([]); // Set to empty array, not [JobProfileStatus.OPEN]
     clearSearch();
     if (!isDemoMode) {
-      fetchWithFilters({ categories: [], statuses: [JobProfileStatus.OPEN] }, 0);
+      fetchWithFilters({ categories: [], statuses: [] }, 0); // Send empty statuses
     }
   };
 
   // Check if any filters are active
-  const hasActiveFilters = activeCategories.length > 0 ||
-    activeStatuses.length !== 1 ||
-    activeStatuses[0] !== JobProfileStatus.OPEN;
-
+  const hasActiveFilters = activeCategories.length > 0 || activeStatuses.length > 0;
   const handleMyProfileClick = async () => {
 
     if (!isAuthenticated) {
@@ -976,13 +998,16 @@ const Portfolios = () => {
                 {/* "All" button - clears filters */}
                 <button
                   onClick={clearAllFilters}
-                  className={`group relative whitespace-nowrap px-4 py-2 text-xs font-bold uppercase tracking-wider transition-all duration-300 rounded-lg shrink-0 ${!hasActiveFilters
+                  className={`group relative whitespace-nowrap px-4 py-2 text-xs font-bold uppercase tracking-wider transition-all duration-300 rounded-lg shrink-0 ${activeCategories.length === 0 && activeStatuses.length === 0 // Only active when both are empty
                     ? "bg-white text-black shadow-[0_0_20px_rgba(255,255,255,0.15)]"
                     : "bg-white/[0.04] text-gray-500 hover:text-white hover:bg-white/[0.08] border border-white/[0.06]"
                     }`}
                 >
                   <span className="flex items-center gap-1.5">
-                    <Zap className={`w-3 h-3 ${!hasActiveFilters ? "text-black" : "text-[#FFAB00]"}`} />
+                    <Zap className={`w-3 h-3 ${activeCategories.length === 0 && activeStatuses.length === 0
+                      ? "text-black"
+                      : "text-[#FFAB00]"
+                      }`} />
                     All
                   </span>
                 </button>
@@ -1021,19 +1046,25 @@ const Portfolios = () => {
                 <div className="w-px h-6 bg-white/[0.06] shrink-0 mx-1" />
 
                 {/* Status Filters */}
+                {/* Status Filters */}
                 <div className="flex items-center gap-1.5">
                   <Filter className="w-3 h-3 text-gray-500" />
                   {statusOptions.map((status) => {
                     const isSelected = activeStatuses.includes(status.value);
+                    const isDisabled = activeCategories.length === 0; // Disabled when ALL is selected
+
                     return (
                       <button
                         key={status.value}
                         onClick={() => handleStatusToggle(status.value)}
-                        className={`group relative whitespace-nowrap px-3 py-2 text-[11px] font-bold uppercase tracking-wider transition-all duration-300 rounded-lg shrink-0 flex items-center gap-1.5 border ${isSelected
-                          ? ""
-                          : "bg-white/[0.03] text-gray-500 hover:text-white hover:bg-white/[0.07] border-transparent hover:border-white/[0.08]"
+                        disabled={isDisabled}
+                        className={`group relative whitespace-nowrap px-3 py-2 text-[11px] font-bold uppercase tracking-wider transition-all duration-300 rounded-lg shrink-0 flex items-center gap-1.5 border ${isDisabled
+                          ? "opacity-30 cursor-not-allowed bg-white/[0.02] text-gray-600 border-white/[0.03]"
+                          : isSelected
+                            ? "bg-opacity-20 border-opacity-50"
+                            : "bg-white/[0.03] text-gray-500 hover:text-white hover:bg-white/[0.07] border-transparent hover:border-white/[0.08]"
                           }`}
-                        style={isSelected ? {
+                        style={isSelected && !isDisabled ? {
                           backgroundColor: `${status.color}20`,
                           borderColor: `${status.color}50`,
                           color: status.color,
@@ -1107,34 +1138,39 @@ const Portfolios = () => {
                   <div className="w-px h-6 bg-white/[0.06] shrink-0 mx-0.5" />
 
                   {/* Status filters for mobile */}
+                  {/* Status filters for mobile */}
                   {statusOptions.map((status) => {
                     const isSelected = activeStatuses.includes(status.value);
+                    const isDisabled = activeCategories.length === 0;
+
                     return (
                       <button
                         key={status.value}
                         onClick={() => handleStatusToggle(status.value)}
-                        className={`group relative whitespace-nowrap px-3 py-2 text-[11px] font-bold uppercase tracking-wider transition-all duration-300 rounded-lg shrink-0 flex items-center gap-1.5 border ${isSelected
-                          ? ""
-                          : "bg-white/[0.05] text-gray-300 border-white/[0.1]"
+                        disabled={isDisabled}
+                        className={`group relative whitespace-nowrap px-3 py-2 text-[11px] font-bold uppercase tracking-wider transition-all duration-300 rounded-lg shrink-0 flex items-center gap-1.5 border ${isDisabled
+                          ? "opacity-30 cursor-not-allowed bg-white/[0.02] text-gray-600 border-white/[0.03]"
+                          : isSelected
+                            ? ""
+                            : "bg-white/[0.05] text-gray-300 border-white/[0.1]"
                           }`}
                         style={
-                          isSelected
+                          isSelected && !isDisabled
                             ? {
                               backgroundColor: `${status.color}20`,
                               borderColor: `${status.color}50`,
                               color: status.color,
                             }
                             : {
-                              borderColor: `${status.color}30`,
+                              borderColor: isDisabled ? `${status.color}15` : `${status.color}30`,
                             }
                         }
                       >
-                        {/* Always-visible colored dot */}
                         <span
                           className="w-2 h-2 rounded-full shrink-0"
                           style={{
-                            backgroundColor: status.color,
-                            boxShadow: `0 0 6px ${status.color}50`,
+                            backgroundColor: isDisabled ? '#4B5563' : status.color,
+                            boxShadow: isDisabled ? 'none' : `0 0 6px ${status.color}50`,
                           }}
                         />
                         {isSelected && <CheckCircle className="w-3 h-3" />}
@@ -1221,7 +1257,34 @@ const Portfolios = () => {
                       )}
                       {activeCategories.length > 0 && activeStatuses.length > 0 && <span> • </span>}
                       {activeStatuses.length > 0 && (
-                        <span className="text-emerald-400">{activeStatuses.map(s => statusOptions.find(o => o.value === s)?.label).join(', ')}</span>
+                        <>
+                          {activeStatuses
+                            .slice(0, 1)
+                            .map(status => {
+                              const statusInfo = statusOptions.find(s => s.value === status);
+                              return (
+                                <motion.button
+                                  key={status}
+                                  initial={{ scale: 0 }}
+                                  animate={{ scale: 1 }}
+                                  exit={{ scale: 0 }}
+                                  onClick={() => handleStatusToggle(status)}
+                                  className="flex items-center gap-1 px-2 py-2 border rounded-lg text-xs font-bold uppercase tracking-wide whitespace-nowrap overflow-hidden"
+                                  style={{
+                                    backgroundColor: `${statusInfo?.color}15`,
+                                    borderColor: `${statusInfo?.color}40`,
+                                    color: statusInfo?.color
+                                  }}
+                                >
+                                  <span>{statusInfo?.label}</span>
+                                  <X className="w-3 h-3 shrink-0" />
+                                </motion.button>
+                              );
+                            })}
+                          {activeStatuses.length > 1 && (
+                            <span className="text-[10px] text-gray-500 font-mono">+{activeStatuses.length - 1}</span>
+                          )}
+                        </>
                       )}
                       <span> • </span><span className="text-[#FFAB00]">{displayDevelopers.length}</span> profiles
                     </>
