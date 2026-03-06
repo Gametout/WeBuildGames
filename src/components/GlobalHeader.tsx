@@ -104,7 +104,7 @@ const CalendlyButton = () => {
 
 // --- JOIN COMMUNITY BUTTON COMPONENT ---
 const JoinCommunityButton = () => {
-  const communityUrl = "https://discord.gg/your-community"; // Replace with your community URL
+  const communityUrl = "https://discord.gg/y8KM2NutqX"; // Replace with your community URL
 
   return (
     <motion.a
