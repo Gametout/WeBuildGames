@@ -475,7 +475,7 @@ const MoreCategoriesButton = ({
 const Portfolios = () => {
   // Multi-filter state (replaces single activeRole)
   const [activeCategories, setActiveCategories] = useState<string[]>([]);
-  const [activeStatuses, setActiveStatuses] = useState<JobProfileStatus[]>([]);
+  const [activeStatuses, setActiveStatuses] = useState<JobProfileStatus[]>([JobProfileStatus.OPEN]);
 
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -520,7 +520,7 @@ const Portfolios = () => {
     refresh: refreshList
   } = usePortfolios({
     categories: activeCategories,
-    statuses: activeStatuses,
+    statuses: activeStatuses.length > 0 ? activeStatuses : [JobProfileStatus.OPEN], // Never send empty
     autoFetch: !isDemoMode
   });
 
@@ -640,11 +640,16 @@ const Portfolios = () => {
     clearSearch();
     setActiveStatuses(prev => {
       const isSelected = prev.includes(status);
-      const newStatuses = isSelected
-        ? prev.filter(s => s !== status)
-        : [...prev, status];
+      let newStatuses: JobProfileStatus[];
 
-      // Trigger fetch with new filters
+      if (isSelected) {
+        // Don't allow deselecting if it's the last one — fallback to OPEN
+        const remaining = prev.filter(s => s !== status);
+        newStatuses = remaining.length > 0 ? remaining : [JobProfileStatus.OPEN];
+      } else {
+        newStatuses = [...prev, status];
+      }
+
       if (!isDemoMode) {
         fetchWithFilters({ categories: activeCategories, statuses: newStatuses }, 0);
       }
@@ -655,15 +660,17 @@ const Portfolios = () => {
   // Clear all filters
   const clearAllFilters = () => {
     setActiveCategories([]);
-    setActiveStatuses([]);
+    setActiveStatuses([JobProfileStatus.OPEN]); // Reset to default, not empty
     clearSearch();
     if (!isDemoMode) {
-      fetchWithFilters({ categories: [], statuses: [] }, 0);
+      fetchWithFilters({ categories: [], statuses: [JobProfileStatus.OPEN] }, 0);
     }
   };
 
   // Check if any filters are active
-  const hasActiveFilters = activeCategories.length > 0 || activeStatuses.length > 0;
+  const hasActiveFilters = activeCategories.length > 0 ||
+    activeStatuses.length !== 1 ||
+    activeStatuses[0] !== JobProfileStatus.OPEN;
 
   const handleMyProfileClick = async () => {
 
@@ -809,7 +816,7 @@ const Portfolios = () => {
             <div className="flex items-center gap-2 sm:gap-3">
 
               {/* Search - Expandable on mobile */}
-              <div className="relative flex-1 group">
+              <div className="relative flex-1 min-w-0 group">
                 <div className="absolute left-0 top-0 bottom-0 w-10 flex items-center justify-center pointer-events-none z-10">
                   <Search className={`w-4 h-4 transition-colors duration-300 ${searchQuery ? 'text-[#FFAB00]' : 'text-gray-600 group-focus-within:text-[#FFAB00]'
                     }`} />
@@ -865,7 +872,7 @@ const Portfolios = () => {
                     initial={{ scale: 0, width: 0 }}
                     animate={{ scale: 1, width: "auto" }}
                     exit={{ scale: 0, width: 0 }}
-                    className="flex items-center gap-1.5 shrink-0"
+                    className="hidden sm:flex items-center gap-1.5 shrink-0"
                   >
                     {/* Selected categories chips */}
                     {activeCategories.slice(0, 2).map(cat => (
@@ -877,51 +884,53 @@ const Portfolios = () => {
                         onClick={() => handleCategoryToggle(cat)}
                         className="flex items-center gap-1 px-2 py-1.5 sm:py-2 bg-[#FFAB00]/15 border border-[#FFAB00]/25 rounded-lg text-[#FFAB00] text-[10px] sm:text-xs font-bold uppercase tracking-wide whitespace-nowrap overflow-hidden"
                       >
-                        <span className="hidden sm:inline">{cat}</span>
-                        <span className="sm:hidden">{cat.slice(0, 4)}</span>
+                        <span>{cat}</span>
                         <X className="w-3 h-3 shrink-0" />
                       </motion.button>
                     ))}
-                    {/* More indicator */}
                     {activeCategories.length > 2 && (
                       <span className="text-[10px] text-gray-500 font-mono">+{activeCategories.length - 2}</span>
                     )}
                     {/* Selected status chips */}
-                    {activeStatuses.slice(0, 1).map(status => {
-                      const statusInfo = statusOptions.find(s => s.value === status);
-                      return (
-                        <motion.button
-                          key={status}
-                          initial={{ scale: 0 }}
-                          animate={{ scale: 1 }}
-                          exit={{ scale: 0 }}
-                          onClick={() => handleStatusToggle(status)}
-                          className="flex items-center gap-1 px-2 py-1.5 sm:py-2 border rounded-lg text-[10px] sm:text-xs font-bold uppercase tracking-wide whitespace-nowrap overflow-hidden"
-                          style={{
-                            backgroundColor: `${statusInfo?.color}15`,
-                            borderColor: `${statusInfo?.color}40`,
-                            color: statusInfo?.color
-                          }}
-                        >
-                          <span className="hidden sm:inline">{statusInfo?.label}</span>
-                          <span className="sm:hidden">{statusInfo?.label.split(' ')[0]}</span>
-                          <X className="w-3 h-3 shrink-0" />
-                        </motion.button>
-                      );
-                    })}
+                    {activeStatuses
+                      .filter(s => !(activeStatuses.length === 1 && s === JobProfileStatus.OPEN)) // Don't show default
+                      .slice(0, 1)
+                      .map(status => {
+                        const statusInfo = statusOptions.find(s => s.value === status);
+                        return (
+                          <motion.button
+                            key={status}
+                            initial={{ scale: 0 }}
+                            animate={{ scale: 1 }}
+                            exit={{ scale: 0 }}
+                            onClick={() => handleStatusToggle(status)}
+                            className="flex items-center gap-1 px-2 py-2 border rounded-lg text-xs font-bold uppercase tracking-wide whitespace-nowrap overflow-hidden"
+                            style={{
+                              backgroundColor: `${statusInfo?.color}15`,
+                              borderColor: `${statusInfo?.color}40`,
+                              color: statusInfo?.color
+                            }}
+                          >
+                            <span>{statusInfo?.label}</span>
+                            <X className="w-3 h-3 shrink-0" />
+                          </motion.button>
+                        );
+                      })}
                     {activeStatuses.length > 1 && (
                       <span className="text-[10px] text-gray-500 font-mono">+{activeStatuses.length - 1}</span>
                     )}
-                    {/* Clear all button */}
-                    <motion.button
-                      initial={{ scale: 0 }}
-                      animate={{ scale: 1 }}
-                      onClick={clearAllFilters}
-                      className="p-1.5 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 hover:bg-red-500/20 transition-colors"
-                      title="Clear all filters"
-                    >
-                      <XCircle className="w-3.5 h-3.5" />
-                    </motion.button>
+                    {/* Clear all */}
+                    {hasActiveFilters && (
+                      <motion.button
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        exit={{ scale: 0 }}
+                        onClick={clearAllFilters}
+                        className="sm:hidden p-2 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 shrink-0"
+                      >
+                        <XCircle className="w-4 h-4" />
+                      </motion.button>
+                    )}
                   </motion.div>
                 )}
               </AnimatePresence>
@@ -1105,8 +1114,8 @@ const Portfolios = () => {
                         key={status.value}
                         onClick={() => handleStatusToggle(status.value)}
                         className={`group relative whitespace-nowrap px-3 py-2 text-[11px] font-bold uppercase tracking-wider transition-all duration-300 rounded-lg shrink-0 flex items-center gap-1.5 border ${isSelected
-                            ? ""
-                            : "bg-white/[0.05] text-gray-300 border-white/[0.1]"
+                          ? ""
+                          : "bg-white/[0.05] text-gray-300 border-white/[0.1]"
                           }`}
                         style={
                           isSelected
