@@ -753,7 +753,7 @@ const Studios = () => {
                             className="flex items-center gap-2 px-3 py-2 rounded-lg bg-sky-500/10 border border-sky-500/30 text-sky-400 hover:bg-sky-500/20 transition-colors"
                           >
                             <Twitter className="w-4 h-4" />
-                            <span className="text-xs font-medium">Twitter</span>
+                            <span className="text-xs font-medium">Itch.io</span>
                           </a>
                         )}
                         {selectedStudio.discordUrl && (
