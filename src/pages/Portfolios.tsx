@@ -280,7 +280,7 @@ const TacticalRow = ({ dev, onClick, isRestricted, onUnlock }: {
     <div className="flex items-center gap-4 w-full md:w-1/4">
       <img src={dev.avatar} alt={dev.name} className="w-10 h-10 rounded-full object-cover border border-white/20" loading="lazy" />
       <div>
-        <h4 className="font-display text-white text-lg leading-none flex items-center gap-2">
+        <h4 className="tracking-widest font-display text-white text-lg leading-none flex items-center gap-2">
           {dev.name}
           {dev.isPremium && <Crown className="w-4 h-4 text-[#FFAB00]" />}
         </h4>
