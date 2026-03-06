@@ -845,14 +845,14 @@ export const UserStudioFormModal = ({
                     <div className="space-y-2">
                       <label className="text-sm font-bold text-gray-300 uppercase flex items-center gap-2">
                         <Twitter className="w-4 h-4 text-sky-500" />
-                        Twitter / X
+                        Itch.io
                       </label>
                       <input
                         type="url"
                         value={formData.twitterUrl || ""}
                         onChange={(e) => updateField("twitterUrl", e.target.value)}
                         className="w-full bg-black/50 border border-white/20 p-3 rounded-lg text-white focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-mono"
-                        placeholder="https://twitter.com/yourstudio"
+                        placeholder="https://itch.io/yourstudio"
                       />
                     </div>
 

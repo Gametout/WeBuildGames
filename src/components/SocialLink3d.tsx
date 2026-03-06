@@ -1,35 +1,58 @@
-import { useState, useMemo } from "react";
+import { useState } from "react";
 import { motion, AnimatePresence, useMotionValue, useSpring, useTransform } from "framer-motion";
 import { 
-  Twitter, Youtube, Linkedin, Instagram, Facebook,
-  Zap, Users, Play, Camera, MessageCircle, TrendingUp,
-  Gamepad2, Trophy, Star, Sparkles, X
+  Youtube, Linkedin, Instagram, TrendingUp,
+  Sparkles
 } from "lucide-react";
+
+// Custom Discord Icon
+const DiscordIcon = ({ className }: { className?: string }) => (
+  <svg viewBox="0 0 24 24" fill="currentColor" className={className}>
+    <path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z" />
+  </svg>
+);
+
+// Custom Steam Icon
+const SteamIcon = ({ className }: { className?: string }) => (
+  <svg viewBox="0 0 24 24" fill="currentColor" className={className}>
+    <path d="M11.979 0C5.678 0 .511 4.86.022 11.037l6.432 2.658c.545-.371 1.203-.59 1.912-.59.063 0 .125.004.188.006l2.861-4.142V8.91c0-2.495 2.028-4.524 4.524-4.524 2.494 0 4.524 2.031 4.524 4.527s-2.03 4.525-4.524 4.525h-.105l-4.076 2.911c0 .052.004.105.004.159 0 1.875-1.515 3.396-3.39 3.396-1.635 0-3.016-1.173-3.331-2.727L.436 15.27C1.862 20.307 6.486 24 11.979 24c6.627 0 11.999-5.373 11.999-12S18.606 0 11.979 0zM7.54 18.21l-1.473-.61c.262.543.714.999 1.314 1.25 1.297.539 2.793-.076 3.332-1.375.263-.63.264-1.319.005-1.949s-.75-1.121-1.377-1.383c-.624-.26-1.29-.249-1.878-.03l1.523.63c.956.4 1.409 1.5 1.009 2.455-.397.957-1.497 1.41-2.454 1.012H7.54zm11.415-9.303c0-1.662-1.353-3.015-3.015-3.015-1.665 0-3.015 1.353-3.015 3.015 0 1.665 1.35 3.015 3.015 3.015 1.663 0 3.015-1.35 3.015-3.015zm-5.273-.005c0-1.252 1.013-2.266 2.265-2.266 1.249 0 2.266 1.014 2.266 2.266 0 1.251-1.017 2.265-2.266 2.265-1.253 0-2.265-1.014-2.265-2.265z" />
+  </svg>
+);
 
 // Enhanced Social Data with descriptions and stats
 const socials = [
-  // { 
-  //   icon: Twitter, 
-  //   label: "Twitter", 
-  //   handle: "@IndieGameDev",
-  //   url: "#",
-  //   color: "#1DA1F2",
-  //   gradient: "from-[#1DA1F2] to-[#0C85D0]",
-  //   description: "Hot takes & dev logs",
-  //   fullDescription: "Daily game dev insights, industry news, and behind-the-scenes content",
-  //   stat: "25K+",
-  //   statLabel: "Followers",
-  //   badge: "Active"
-  // },
+  { 
+    icon: DiscordIcon, 
+    label: "Discord", 
+    handle: "GameTout Community",
+    url: "https://discord.com/invite/7c5hD3zken",
+    color: "#7289DA",
+    gradient: "from-[#7289DA] to-[#5865F2]",
+    description: "Join our community",
+    stat: "5K+",
+    statLabel: "Members",
+    badge: "Active"
+  },
+  { 
+    icon: SteamIcon, 
+    label: "Steam", 
+    handle: "GameTout",
+    url: "https://store.steampowered.com/YOUR_PAGE",
+    color: "#66c0f4",
+    gradient: "from-[#66c0f4] to-[#1b2838]",
+    description: "Games & Wishlist",
+    stat: "Coming",
+    statLabel: "Soon",
+    badge: "New"
+  },
   { 
     icon: Linkedin, 
     label: "LinkedIn", 
-    handle: "/company/gamedev",
-    url: "https://www.linkedin.com/in/gametout/",
+    handle: "/gametout",
+    url: "https://www.linkedin.com/in/gametout/?originalSubdomain=in",
     color: "#0077B5",
     gradient: "from-[#0077B5] to-[#005885]",
     description: "Career & networking",
-    fullDescription: "Job opportunities, studio news, and professional connections",
     stat: "10K+",
     statLabel: "Network",
     badge: "Hiring"
@@ -37,12 +60,11 @@ const socials = [
   { 
     icon: Youtube, 
     label: "YouTube", 
-    handle: "@DevStreams",
+    handle: "@GameTout",
     url: "https://www.youtube.com/@GameTout",
     color: "#FF0000",
     gradient: "from-[#FF0000] to-[#CC0000]",
     description: "Tutorials & devlogs",
-    fullDescription: "In-depth tutorials, game breakdowns, and live coding sessions",
     stat: "100K+",
     statLabel: "Subscribers",
     badge: "Live"
@@ -50,29 +72,15 @@ const socials = [
   { 
     icon: Instagram, 
     label: "Instagram", 
-    handle: "@gamedev.art",
+    handle: "@game_tout",
     url: "https://www.instagram.com/game_tout",
     color: "#E4405F",
     gradient: "from-[#E4405F] via-[#C13584] to-[#833AB4]",
     description: "Art & screenshots",
-    fullDescription: "Stunning game art, concept designs, and visual inspiration",
     stat: "50K+",
     statLabel: "Followers",
     badge: "New Post"
   },
-  // { 
-  //   icon: Facebook, 
-  //   label: "Facebook", 
-  //   handle: "/GameDevCommunity",
-  //   url: "#",
-  //   color: "#1877F2",
-  //   gradient: "from-[#1877F2] to-[#0C5DC7]",
-  //   description: "Community hub",
-  //   fullDescription: "Join discussions, events, and connect with fellow developers",
-  //   stat: "30K+",
-  //   statLabel: "Members",
-  //   badge: "Community"
-  // },
 ];
 
 // ============================================
@@ -80,7 +88,6 @@ const socials = [
 // ============================================
 export const SocialLink3D = () => {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
-  const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
 
   return (
     <div className="w-full">
@@ -106,23 +113,11 @@ export const SocialLink3D = () => {
             {...social} 
             index={index}
             isHovered={hoveredIndex === index}
-            isExpanded={expandedIndex === index}
             onHover={() => setHoveredIndex(index)}
             onLeave={() => setHoveredIndex(null)}
-            onClick={() => setExpandedIndex(expandedIndex === index ? null : index)}
           />
         ))}
       </div>
-
-      {/* Expanded Card Details Panel */}
-      <AnimatePresence>
-        {expandedIndex !== null && (
-          <ExpandedPanel 
-            social={socials[expandedIndex]} 
-            onClose={() => setExpandedIndex(null)}
-          />
-        )}
-      </AnimatePresence>
 
       {/* Floating CTA */}
       <motion.div
@@ -155,10 +150,8 @@ interface SocialCardProps {
   badge: string;
   index: number;
   isHovered: boolean;
-  isExpanded: boolean;
   onHover: () => void;
   onLeave: () => void;
-  onClick: () => void;
 }
 
 const SocialCard = ({ 
@@ -174,10 +167,8 @@ const SocialCard = ({
   badge,
   index,
   isHovered,
-  isExpanded,
   onHover,
-  onLeave,
-  onClick
+  onLeave
 }: SocialCardProps) => {
   const cardRef = useMotionValue(0);
   
@@ -203,6 +194,11 @@ const SocialCard = ({
     onLeave();
   };
 
+  // Handle click to open link
+  const handleClick = () => {
+    window.open(url, '_blank', 'noopener,noreferrer');
+  };
+
   return (
     <motion.div
       className="relative group"
@@ -217,8 +213,8 @@ const SocialCard = ({
       onMouseEnter={onHover}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
-      onClick={onClick}
-      style={{ perspective: 1000 }}
+      onClick={handleClick}
+      style={{ perspective: 1000, cursor: 'pointer' }}
     >
       <motion.div
         className="relative cursor-pointer"
@@ -359,16 +355,6 @@ const SocialCard = ({
             )}
           </AnimatePresence>
 
-          {/* Pulse ring on click */}
-          {isExpanded && (
-            <motion.div
-              className="absolute inset-0 rounded-2xl"
-              style={{ border: `2px solid ${color}` }}
-              initial={{ scale: 1, opacity: 1 }}
-              animate={{ scale: 1.5, opacity: 0 }}
-              transition={{ duration: 0.5, repeat: Infinity }}
-            />
-          )}
         </motion.div>
 
         {/* Badge indicator */}
@@ -467,260 +453,6 @@ const SocialCard = ({
       </AnimatePresence>
     </motion.div>
   );
-};
-
-// ============================================
-// EXPANDED PANEL COMPONENT
-// ============================================
-// ============================================
-// EXPANDED PANEL COMPONENT - FIXED
-// ============================================
-const ExpandedPanel = ({ social, onClose }: { social: typeof socials[0]; onClose: () => void }) => {
-  const Icon = social.icon;
-  
-  return (
-    <motion.div
-      className="mt-8 relative"
-      initial={{ opacity: 0, height: 0, y: -20 }}
-      animate={{ opacity: 1, height: "auto", y: 0 }}
-      exit={{ opacity: 0, height: 0, y: -20 }}
-      transition={{ duration: 0.4, type: "spring", damping: 20 }}
-    >
-      <div 
-        className="relative p-6 rounded-2xl overflow-hidden"
-        style={{
-          background: `linear-gradient(135deg, rgba(10,10,10,0.95), rgba(15,15,15,0.95))`,
-          border: `1px solid ${social.color}30`,
-          boxShadow: `0 20px 60px -20px ${social.color}20`
-        }}
-      >
-        {/* Background effects */}
-        <div 
-          className="absolute inset-0 opacity-5"
-          style={{
-            backgroundImage: `linear-gradient(${social.color} 1px, transparent 1px), linear-gradient(90deg, ${social.color} 1px, transparent 1px)`,
-            backgroundSize: '30px 30px'
-          }}
-        />
-        
-        {/* Animated gradient orb */}
-        <motion.div
-          className="absolute -top-20 -right-20 w-40 h-40 rounded-full blur-3xl"
-          style={{ background: social.color }}
-          animate={{ 
-            opacity: [0.1, 0.2, 0.1],
-            scale: [1, 1.2, 1]
-          }}
-          transition={{ duration: 3, repeat: Infinity }}
-        />
-
-        {/* Close button - FIXED */}
-        <motion.button
-          onClick={(e) => {
-            e.stopPropagation(); // Prevent event bubbling
-            e.preventDefault();
-            onClose();
-          }}
-          className="absolute top-4 right-4 w-8 h-8 rounded-full flex items-center justify-center border transition-colors z-50 cursor-pointer"
-          style={{ 
-            borderColor: `${social.color}30`,
-            color: social.color,
-            background: 'rgba(0,0,0,0.5)',
-            backdropFilter: 'blur(4px)'
-          }}
-          whileHover={{ 
-            scale: 1.1, 
-            borderColor: social.color,
-            background: `linear-gradient(135deg, ${social.color}20, ${social.color}10)`
-          }}
-          whileTap={{ scale: 0.9 }}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-        >
-          <X className="w-4 h-4" />
-        </motion.button>
-
-        <div className="relative z-10 flex flex-col md:flex-row gap-6 items-start">
-          
-          {/* Left side - Icon and basic info */}
-          <div className="flex-shrink-0">
-            <motion.div
-              className="w-20 h-20 rounded-2xl flex items-center justify-center relative overflow-hidden"
-              style={{ 
-                background: `linear-gradient(135deg, ${social.color}20, transparent)`,
-                border: `1px solid ${social.color}40`
-              }}
-              animate={{ 
-                boxShadow: [
-                  `0 0 20px ${social.color}20`,
-                  `0 0 40px ${social.color}30`,
-                  `0 0 20px ${social.color}20`
-                ]
-              }}
-              transition={{ duration: 2, repeat: Infinity }}
-            >
-              {/* Rotating border */}
-              <motion.div
-                className="absolute inset-0"
-                style={{
-                  background: `conic-gradient(from 0deg, transparent, ${social.color}, transparent)`,
-                  opacity: 0.3
-                }}
-                animate={{ rotate: 360 }}
-                transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
-              />
-              
-              <Icon className="w-10 h-10 relative z-10" style={{ color: social.color }} />
-            </motion.div>
-          </div>
-
-          {/* Right side - Content */}
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-3 mb-2">
-              <h3 className="font-display text-2xl uppercase tracking-wider" style={{ color: social.color }}>
-                {social.label}
-              </h3>
-              <span 
-                className="px-2 py-0.5 rounded text-[10px] font-bold uppercase"
-                style={{ 
-                  background: `${social.color}20`,
-                  color: social.color,
-                  border: `1px solid ${social.color}40`
-                }}
-              >
-                {social.badge}
-              </span>
-            </div>
-
-            <p className="text-gray-500 font-mono text-sm mb-4">{social.handle}</p>
-
-            <p className="text-gray-300 text-sm leading-relaxed mb-6 max-w-md">
-              {social.fullDescription}
-            </p>
-
-            {/* Stats row */}
-            <div className="flex gap-6 mb-6">
-              <div className="text-center">
-                <div className="font-display text-2xl" style={{ color: social.color }}>{social.stat}</div>
-                <div className="text-[10px] text-gray-500 uppercase tracking-wider">{social.statLabel}</div>
-              </div>
-              <div className="text-center">
-                <div className="font-display text-2xl text-white">Daily</div>
-                <div className="text-[10px] text-gray-500 uppercase tracking-wider">Updates</div>
-              </div>
-              <div className="text-center">
-                <div className="font-display text-2xl text-green-400">Active</div>
-                <div className="text-[10px] text-gray-500 uppercase tracking-wider">Status</div>
-              </div>
-            </div>
-
-            {/* What you'll get section */}
-            <div className="mb-6">
-              <h4 className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-3">What You'll Get</h4>
-              <div className="grid grid-cols-2 gap-2">
-                {getPerksForPlatform(social.label).map((perk, i) => (
-                  <motion.div
-                    key={i}
-                    className="flex items-center gap-2 text-xs text-gray-400"
-                    initial={{ opacity: 0, x: -10 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.1 + i * 0.05 }}
-                  >
-                    <div 
-                      className="w-1.5 h-1.5 rounded-full"
-                      style={{ background: social.color, boxShadow: `0 0 6px ${social.color}` }}
-                    />
-                    {perk}
-                  </motion.div>
-                ))}
-              </div>
-            </div>
-
-            {/* CTA Button */}
-            <motion.a
-              href={social.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-3 px-6 py-3 rounded-xl font-bold uppercase text-sm tracking-wider transition-all group"
-              style={{
-                background: `linear-gradient(135deg, ${social.color}, ${adjustColor(social.color, -30)})`,
-                color: '#000',
-                boxShadow: `0 10px 30px -10px ${social.color}60`
-              }}
-              whileHover={{ scale: 1.02, boxShadow: `0 15px 40px -10px ${social.color}80` }}
-              whileTap={{ scale: 0.98 }}
-            >
-              <span>Follow Now</span>
-              <motion.div
-                animate={{ x: [0, 5, 0] }}
-                transition={{ duration: 1, repeat: Infinity }}
-              >
-                →
-              </motion.div>
-            </motion.a>
-          </div>
-        </div>
-
-        {/* Decorative elements */}
-        <div className="absolute bottom-0 left-0 right-0 h-1 overflow-hidden">
-          <motion.div
-            className="h-full"
-            style={{ background: `linear-gradient(90deg, transparent, ${social.color}, transparent)` }}
-            animate={{ x: ["-100%", "100%"] }}
-            transition={{ duration: 2, repeat: Infinity }}
-          />
-        </div>
-      </div>
-    </motion.div>
-  );
-};
-
-// ============================================
-// HELPER FUNCTIONS
-// ============================================
-const getPerksForPlatform = (platform: string): string[] => {
-  const perks: Record<string, string[]> = {
-    Twitter: [
-      "Real-time dev updates",
-      "Industry hot takes",
-      "Quick tips & tricks",
-      "Community discussions"
-    ],
-    LinkedIn: [
-      "Job opportunities",
-      "Professional insights",
-      "Studio announcements",
-      "Career growth tips"
-    ],
-    YouTube: [
-      "In-depth tutorials",
-      "Game dev breakdowns",
-      "Live coding streams",
-      "Exclusive content"
-    ],
-    Instagram: [
-      "Stunning game art",
-      "Behind-the-scenes",
-      "Concept designs",
-      "Visual inspiration"
-    ],
-    Facebook: [
-      "Community events",
-      "Group discussions",
-      "Exclusive previews",
-      "Developer AMAs"
-    ]
-  };
-  return perks[platform] || [];
-};
-
-const adjustColor = (hex: string, amount: number): string => {
-  const num = parseInt(hex.replace("#", ""), 16);
-  const r = Math.min(255, Math.max(0, (num >> 16) + amount));
-  const g = Math.min(255, Math.max(0, ((num >> 8) & 0x00FF) + amount));
-  const b = Math.min(255, Math.max(0, (num & 0x0000FF) + amount));
-  return `#${((r << 16) | (g << 8) | b).toString(16).padStart(6, "0")}`;
 };
 
 // ============================================
