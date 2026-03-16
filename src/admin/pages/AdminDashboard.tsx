@@ -49,6 +49,18 @@ const adminCards = [
     borderColor: "border-red-500/30",
     stats: { label: "Featured", value: "5" }
   },
+  {
+    id: "portfolios",
+    title: "Portfolio Control",
+    subtitle: "Manage talent profiles",
+    description: "Search, filter and permanently delete any portfolio profile on the platform",
+    icon: Users,
+    path: "/admin/portfolios",
+    color: "#00D4FF",
+    gradient: "from-cyan-500/20 to-blue-500/20",
+    borderColor: "border-cyan-500/30",
+    stats: { label: "Profiles", value: "DB" }
+  },
 ];
 
 // Animated background grid component

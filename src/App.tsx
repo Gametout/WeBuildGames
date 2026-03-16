@@ -14,6 +14,7 @@ import AdminArticlePreview from "@/admin/pages/AdminArticlePreview";
 import AdminStudios from "@/admin/pages/AdminStudios";
 import AdminFeatured from "@/admin/pages/AdminFeatured";
 import AdminDashboard from "@/admin/pages/AdminDashboard";
+import AdminPortfolios from "@/admin/pages/AdminPortfolios";
 import { AdminGuard } from "@/admin/AdminGuard";
 
 import FAQ from "./pages/FAQ";
@@ -87,6 +88,14 @@ const AnimatedRoutes = () => {
             element={
                 <AdminGuard>
                     <AdminFeatured />
+                </AdminGuard>
+            } 
+        />
+        <Route 
+            path="/admin/portfolios" 
+            element={
+                <AdminGuard>
+                    <AdminPortfolios />
                 </AdminGuard>
             } 
         />
