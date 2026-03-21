@@ -149,6 +149,13 @@ export enum JobProfileStatus {
   DEPLOYED = "DEPLOYED",
 }
 
+export enum GameEngine {
+  UNITY = "UNITY",
+  UNREAL = "UNREAL",
+  GODOT = "GODOT",
+  OTHER = "OTHER",
+}
+
 // ===========================================
 // CATEGORY MAPPING (Frontend Display ↔ Backend)
 // ===========================================
@@ -494,6 +501,7 @@ export interface PortfolioDetail {
   contactEmail: string | null;
   mobile: string | null;
   resumeUrl: string | null;
+  enginePreference?: GameEngine;
   skills: SkillDTO[];
   socials: SocialLinkDTO[];
   user?: {
@@ -521,6 +529,7 @@ export interface PortfolioRequest {
   skills: SkillDTO[];
   socials: SocialLinkDTO[];
   resumeUrl?: string;
+  enginePreference?: GameEngine;
 }
 
 // ===========================================
@@ -559,6 +568,47 @@ export interface PortfolioFilters {
   categories: string[];          // Frontend display names (will be converted to backend enums)
   statuses: JobProfileStatus[];  // Backend status enums
 }
+
+/**
+ * Advanced Filter Request
+ * Sent to backend for complex multi-criteria filtering
+ * 
+ * All fields are optional (null = don't filter by this field)
+ * Multiple values within a field use OR logic
+ * Multiple fields use AND logic
+ */
+export interface AdvancedFilterRequest {
+  jobCategories: JobCategory[];
+  jobStatuses: JobProfileStatus[];
+  skillNames: string[];
+  minExperienceYears: number | null;
+  maxExperienceYears: number | null;
+  enginePreferences: GameEngine[];
+  location: string | null;
+  page: number;
+  size: number;
+}
+
+/**
+ * Experience level presets for UI
+ */
+export const EXPERIENCE_PRESETS = [
+  { label: "Any", min: null, max: null },
+  { label: "0-2 years", min: 0, max: 2 },
+  { label: "2-5 years", min: 2, max: 5 },
+  { label: "5-10 years", min: 5, max: 10 },
+  { label: "10+ years", min: 10, max: null },
+];
+
+/**
+ * Game engine options for UI
+ */
+export const ALL_GAME_ENGINES = [
+  { label: "Unity", value: "UNITY" },
+  { label: "Unreal", value: "UNREAL" },
+  { label: "Godot", value: "GODOT" },
+  { label: "Other", value: "OTHER" },
+];
 
 // ===========================================
 // Frontend UI Types (derived from backend data)

@@ -7,7 +7,7 @@ import {
 } from "lucide-react";
 import { usePortfolioMutation } from "@/hooks/usePortfolioDetail";
 import { useAuth } from "@/context/AuthContext";
-import { JobCategory, JobProfileStatus, PortfolioRequest, CATEGORY_TO_BACKEND, DISPLAY_TO_STATUS, PortfolioDetail, BACKEND_TO_CATEGORY } from "@/types/portfolio";
+import { JobCategory, JobProfileStatus, PortfolioRequest, CATEGORY_TO_BACKEND, DISPLAY_TO_STATUS, PortfolioDetail, BACKEND_TO_CATEGORY, GameEngine } from "@/types/portfolio";
 import { MediaUploader } from "@/components/MediaUploader";
 import { mediaUploadService } from "@/services/mediaUploadService";
 import { portfolioService } from "@/services/portfolioService";
@@ -63,6 +63,16 @@ const roles = [
   "BizDev", "3D Artist", "VFX Artist", "Mentor", "Video Editor", "Other"
 ];
 const statusOptions = ["Open for Work", "Freelance", "Deployed"];
+
+const engineOptions = ["Unity", "Unreal", "Godot", "Other"];
+
+const engineToEnum: Record<string, GameEngine> = {
+  "Unity": GameEngine.UNITY,
+  "Unreal": GameEngine.UNREAL,
+  "Godot": GameEngine.GODOT,
+  "Other": GameEngine.OTHER,
+};
+
 
 const MAX_SHORT_DESCRIPTION = 100;
 const MAX_PROFILE_SUMMARY = 500;
@@ -346,6 +356,79 @@ const StatusDropdown = ({ value, onChange }: { value: string; onChange: (value: 
   );
 };
 
+// Engine Preference Dropdown Component
+const EngineDropdown = ({ value, onChange }: { value: string; onChange: (value: string) => void }) => {
+  const [isOpen, setIsOpen] = useState(false);
+
+  return (
+    <div className="relative w-full">
+      <motion.button
+        type="button"
+        onClick={() => setIsOpen(!isOpen)}
+        className={`w-full bg-[#0a0a0a] border border-white/20 p-3 rounded-sm text-white focus:border-[#FFAB00] transition-colors font-mono flex items-center justify-between ${isOpen ? 'border-[#FFAB00]' : ''
+          }`}
+        whileTap={{ scale: 0.98 }}
+      >
+        <span className="uppercase">{value || "Select Engine"}</span>
+        <motion.div
+          animate={{ rotate: isOpen ? 180 : 0 }}
+          transition={{ duration: 0.2 }}
+        >
+          <ChevronDown className="w-4 h-4 text-gray-400" />
+        </motion.div>
+      </motion.button>
+
+      <AnimatePresence>
+        {isOpen && (
+          <>
+            {/* Backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 z-40"
+              onClick={() => setIsOpen(false)}
+            />
+
+            {/* Dropdown - opens upward */}
+            <motion.div
+              initial={{ opacity: 0, y: 10, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 10, scale: 0.95 }}
+              className="absolute bottom-full left-0 right-0 mb-2 bg-[#0a0a0a] border border-[#FFAB00]/30 rounded-lg shadow-2xl"
+              style={{
+                boxShadow: '0 -10px 50px rgba(0,0,0,0.8), 0 0 20px rgba(255,171,0,0.1)',
+                zIndex: 50
+              }}
+            >
+              {engineOptions.map((engine) => (
+                <motion.button
+                  key={engine}
+                  type="button"
+                  onClick={() => {
+                    onChange(engine);
+                    setIsOpen(false);
+                  }}
+                  className={`w-full px-4 py-3 text-left text-sm hover:bg-white/10 transition-colors flex items-center gap-2 ${value === engine
+                    ? 'bg-[#FFAB00]/20 text-[#FFAB00] font-bold'
+                    : 'text-gray-300'
+                    }`}
+                  whileHover={{ x: 4 }}
+                >
+                  <span className="uppercase">{engine}</span>
+                  {value === engine && (
+                    <CheckCircle className="w-4 h-4 ml-auto" />
+                  )}
+                </motion.button>
+              ))}
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+};
+
 const getJobCategoryFromRole = (role: string): JobCategory => {
   return CATEGORY_TO_BACKEND[role] || JobCategory.OTHER;
 };
@@ -379,6 +462,7 @@ export const CreatePortfolioModal = ({ isOpen, onClose, onSuccess, initialData, 
     profilePhotoUrl: "",
     coverPhotoUrl: "",
     resumeUrl: "",
+    enginePreference: "",
     skills: [{ name: "", score: 50 }],
     socials: [{ platform: "", url: "" }]
   });
@@ -409,6 +493,7 @@ export const CreatePortfolioModal = ({ isOpen, onClose, onSuccess, initialData, 
         profilePhotoUrl: initialData.profilePhotoUrl || "",
         coverPhotoUrl: initialData.coverPhotoUrl || "",
         resumeUrl: initialData.resumeUrl || "",
+        enginePreference: initialData.enginePreference || "",
         // Ensure arrays have at least one empty item if empty
         skills: initialData.skills && initialData.skills.length > 0
           ? initialData.skills.map(s => ({ name: s.name, score: s.score || 50 }))
@@ -432,6 +517,7 @@ export const CreatePortfolioModal = ({ isOpen, onClose, onSuccess, initialData, 
         profilePhotoUrl: "",
         coverPhotoUrl: "",
         resumeUrl: "",
+        enginePreference: "",
         skills: [{ name: "", score: 50 }],
         socials: [{ platform: "", url: "" }]
       });
@@ -477,6 +563,7 @@ export const CreatePortfolioModal = ({ isOpen, onClose, onSuccess, initialData, 
         profilePhotoUrl: "",
         coverPhotoUrl: "",
         resumeUrl: "",
+        enginePreference: "",
         skills: [{ name: "", score: 50 }],
         socials: [{ platform: "", url: "" }]
       });
@@ -639,6 +726,7 @@ export const CreatePortfolioModal = ({ isOpen, onClose, onSuccess, initialData, 
       profilePhotoUrl: clean(formData.profilePhotoUrl),
       coverPhotoUrl: clean(formData.coverPhotoUrl),
       resumeUrl: clean(formData.resumeUrl),
+      enginePreference: formData.enginePreference ? (formData.enginePreference as any) : undefined,
       skills: formData.skills
         .filter(s => s.name && s.name.trim() !== "")
         .map(s => ({ name: s.name.trim(), score: s.score })),
@@ -955,6 +1043,14 @@ export const CreatePortfolioModal = ({ isOpen, onClose, onSuccess, initialData, 
                         <RoleDropdown
                           value={formData.role}
                           onChange={(value) => setFormData({ ...formData, role: value })}
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <label className="text-sm font-bold text-gray-300 uppercase">Game Engine (Optional)</label>
+                        <EngineDropdown
+                          value={formData.enginePreference}
+                          onChange={(value) => setFormData({ ...formData, enginePreference: value })}
                         />
                       </div>
 

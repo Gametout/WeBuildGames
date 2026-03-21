@@ -13,11 +13,13 @@ import { PremiumPortfolioCard } from "@/components/PremiumPortfolioCard";
 import { ResponsiveMasonryGrid } from "@/components/MasonryGrid";
 import { PricingModal } from "@/components/PricingModal";
 import { ClassifiedOverlay } from "@/components/ClassifiedOverlay";
+import MoreFiltersModal from "@/components/MoreFiltersModal";
 
 // API Hooks
 import { usePortfolios, usePortfolioRails } from "@/hooks/usePortfolios";
 import { usePortfolioSearch } from "@/hooks/usePortfolioSearch";
 import { useEliteAccess } from "@/hooks/useEliteAccess";
+import { useAdvancedFilter } from "@/hooks/useAdvancedFilter";
 import { Developer, PortfolioDetail, JobProfileStatus, PortfolioFilters } from "@/types/portfolio";
 
 // Demo Data for showcasing new design
@@ -695,6 +697,10 @@ const Portfolios = () => {
   const [activeCategories, setActiveCategories] = useState<string[]>([]);
   const [activeStatuses, setActiveStatuses] = useState<JobProfileStatus[]>([]);
 
+  // Advanced filter modal state
+  const [isMoreFiltersOpen, setIsMoreFiltersOpen] = useState(false);
+  const [usingAdvancedFilter, setUsingAdvancedFilter] = useState(false);
+
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isPricingOpen, setIsPricingOpen] = useState(false);
@@ -734,6 +740,9 @@ const Portfolios = () => {
     daysRemaining,
     isExpiringSoon,
   } = useEliteAccess({ demoMode: isDemoMode });
+
+  // Advanced Filter Hook
+  const advancedFilter = useAdvancedFilter();
 
   // API Hooks
   const {
@@ -811,6 +820,9 @@ const Portfolios = () => {
   // Determine which data to show
   const isSearchActive = searchQuery.length >= 2;
   const displayDevelopers = useMemo(() => {
+    if (usingAdvancedFilter && advancedFilter.developers.length > 0) {
+      return advancedFilter.developers;
+    }
     if (isSearchActive) {
       if (isDemoMode) {
         const query = searchQuery.toLowerCase();
@@ -823,7 +835,7 @@ const Portfolios = () => {
       return searchResults;
     }
     return developers;
-  }, [isSearchActive, isDemoMode, searchQuery, searchResults, developers]);
+  }, [isSearchActive, isDemoMode, searchQuery, searchResults, developers, usingAdvancedFilter, advancedFilter.developers]);
 
   const isRestricted = !isElite && isAuthenticated;
 
@@ -1018,6 +1030,30 @@ const Portfolios = () => {
           }}
           developer={selectedDev}
           portfolioId={selectedDevId}
+        />
+
+        {/* Advanced Filters Modal */}
+        <MoreFiltersModal
+          isOpen={isMoreFiltersOpen}
+          onClose={() => setIsMoreFiltersOpen(false)}
+          jobCategories={advancedFilter.jobCategories}
+          jobStatuses={advancedFilter.jobStatuses}
+          skillNames={advancedFilter.skillNames}
+          minExperienceYears={advancedFilter.minExperienceYears}
+          maxExperienceYears={advancedFilter.maxExperienceYears}
+          enginePreferences={advancedFilter.enginePreferences}
+          location={advancedFilter.location}
+          setJobCategories={advancedFilter.setJobCategories}
+          setJobStatuses={advancedFilter.setJobStatuses}
+          setSkillNames={advancedFilter.setSkillNames}
+          setExperienceRange={advancedFilter.setExperienceRange}
+          setEnginePreferences={advancedFilter.setEnginePreferences}
+          setLocation={advancedFilter.setLocation}
+          onApplyFilters={async () => {
+            await advancedFilter.applyFilters(0);
+            setUsingAdvancedFilter(true);
+          }}
+          isLoading={advancedFilter.loading}
         />
 
         {/* Classified Overlay Modal */}
@@ -1273,6 +1309,19 @@ const Portfolios = () => {
                     onCategoryToggle={handleCategoryToggle}
                   />
                 )}
+
+                {/* Advanced Filter Button */}
+                <button
+                  onClick={() => setIsMoreFiltersOpen(true)}
+                  className={`group relative whitespace-nowrap px-3 sm:px-4 py-2 text-[11px] sm:text-xs font-bold uppercase tracking-wider transition-all duration-300 rounded-lg shrink-0 flex items-center gap-1.5 ${usingAdvancedFilter
+                    ? "bg-[#FF6B9D] text-white shadow-[0_0_20px_rgba(255,107,157,0.25)]"
+                    : "bg-white/[0.03] text-gray-500 hover:text-white hover:bg-white/[0.07] border border-transparent hover:border-white/[0.08]"
+                    }`}
+                  title="Open advanced filters for skill, experience, engine, location"
+                >
+                  <Sparkles className="w-3 h-3" />
+                  More Filters
+                </button>
 
                 {/* Separator before status filters */}
                 <div className="w-px h-6 bg-white/[0.06] shrink-0 mx-1" />

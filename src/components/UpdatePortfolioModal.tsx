@@ -9,7 +9,7 @@ import { usePortfolioMutation } from "@/hooks/usePortfolioDetail";
 import { useAuth } from "@/context/AuthContext";
 import {
   JobCategory, JobProfileStatus, PortfolioRequest, CATEGORY_TO_BACKEND,
-  DISPLAY_TO_STATUS, PortfolioDetail, BACKEND_TO_CATEGORY
+  DISPLAY_TO_STATUS, PortfolioDetail, BACKEND_TO_CATEGORY, GameEngine
 } from "@/types/portfolio";
 import { MediaUploader } from "@/components/MediaUploader";
 import { mediaUploadService } from "@/services/mediaUploadService";
@@ -63,6 +63,15 @@ const roles = [
   "BizDev", "3D Artist", "VFX Artist", "Mentor", "Video Editor", "Other"
 ];
 const statusOptions = ["Open for Work", "Freelance", "Deployed"];
+
+const engineOptions = ["Unity", "Unreal", "Godot", "Other"];
+
+const engineToEnum: Record<string, GameEngine> = {
+  "Unity": GameEngine.UNITY,
+  "Unreal": GameEngine.UNREAL,
+  "Godot": GameEngine.GODOT,
+  "Other": GameEngine.OTHER,
+};
 
 const PLATFORM_OPTIONS = [
   { value: "LinkedIn", label: "LinkedIn", icon: Linkedin, color: "#0077B5" },
@@ -303,6 +312,68 @@ const StatusDropdown = ({ value, onChange }: {
   );
 };
 
+// Engine Preference Dropdown Component
+const EngineDropdown = ({ value, onChange }: { value: string; onChange: (value: string) => void }) => {
+  const [isOpen, setIsOpen] = useState(false);
+
+  return (
+    <div className="relative w-full">
+      <motion.button
+        type="button"
+        onClick={() => setIsOpen(!isOpen)}
+        className={`w-full text-left bg-black/50 border-b border-white/20 text-white text-sm font-mono py-2 px-3 hover:border-[#FFAB00] transition-colors flex items-center justify-between rounded-sm ${isOpen ? "border-[#FFAB00]" : ""}`}
+        whileTap={{ scale: 0.98 }}
+      >
+        <span className="uppercase">{value || "Select Engine"}</span>
+        <motion.div
+          animate={{ rotate: isOpen ? 180 : 0 }}
+          transition={{ duration: 0.2 }}
+        >
+          <ChevronDown className="w-3.5 h-3.5 text-gray-400" />
+        </motion.div>
+      </motion.button>
+
+      <AnimatePresence>
+        {isOpen && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 z-40"
+              onClick={() => setIsOpen(false)}
+            />
+            <motion.div
+              initial={{ opacity: 0, y: 10, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 10, scale: 0.95 }}
+              className="absolute left-0 right-0 mt-2 bg-[#0a0a0a] border border-[#FFAB00]/30 rounded-lg shadow-2xl z-50"
+            >
+              {engineOptions.map((engine) => (
+                <button
+                  key={engine}
+                  type="button"
+                  onClick={() => {
+                    onChange(engine);
+                    setIsOpen(false);
+                  }}
+                  className={`w-full px-4 py-2.5 text-left text-sm flex items-center gap-3 border-b border-white/5 last:border-b-0 ${
+                    value === engine
+                      ? "text-[#FFAB00] bg-[#FFAB00]/10"
+                      : "text-gray-300 hover:text-white hover:bg-white/10"
+                  } transition-colors`}
+                >
+                  <span className="uppercase">{engine}</span>
+                </button>
+              ))}
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+};
+
 const getJobCategoryFromRole = (role: string): JobCategory => {
   return CATEGORY_TO_BACKEND[role] || JobCategory.OTHER;
 };
@@ -329,6 +400,7 @@ export const UpdatePortfolioModal = ({
     profilePhotoUrl: "",
     coverPhotoUrl: "",
     resumeUrl: "",
+    enginePreference: "",
     skills: [{ name: "", score: 50 }],
     socials: [{ platform: "", url: "" }]
   });
@@ -356,6 +428,7 @@ export const UpdatePortfolioModal = ({
         profilePhotoUrl: initialData.profilePhotoUrl || "",
         coverPhotoUrl: initialData.coverPhotoUrl || "",
         resumeUrl: initialData.resumeUrl || "",
+        enginePreference: initialData.enginePreference || "",
         skills: initialData.skills && initialData.skills.length > 0
           ? initialData.skills.map(s => ({ name: s.name, score: s.score || 50 }))
           : [{ name: "", score: 50 }],
@@ -552,6 +625,7 @@ export const UpdatePortfolioModal = ({
       profilePhotoUrl: clean(formData.profilePhotoUrl),
       coverPhotoUrl: clean(formData.coverPhotoUrl),
       resumeUrl: clean(formData.resumeUrl),
+      enginePreference: formData.enginePreference ? (formData.enginePreference as any) : undefined,
       skills: formData.skills
         .filter(s => s.name && s.name.trim() !== "")
         .map(s => ({ name: s.name.trim(), score: s.score })),
@@ -669,6 +743,11 @@ export const UpdatePortfolioModal = ({
                         <label className="block text-xs text-gray-400 uppercase mb-2">Job Status</label>
                         <StatusDropdown value={formData.jobStatus} onChange={(status) => setFormData({ ...formData, jobStatus: status })} />
                       </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-xs text-gray-400 uppercase mb-2">Game Engine (Optional)</label>
+                      <EngineDropdown value={formData.enginePreference} onChange={(engine) => setFormData({ ...formData, enginePreference: engine })} />
                     </div>
 
                     <div>

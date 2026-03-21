@@ -8,7 +8,7 @@ import {
 } from "lucide-react";
 import { SkillBar } from "@/components/HealthBar";
 import { usePortfolioDetail } from "@/hooks/usePortfolioDetail";
-import { Developer, PortfolioDetail, STATUS_DISPLAY, BACKEND_TO_CATEGORY } from "@/types/portfolio"; // Import BACKEND_TO_CATEGORY
+import { Developer, PortfolioDetail, STATUS_DISPLAY, BACKEND_TO_CATEGORY, GameEngine } from "@/types/portfolio"; // Import BACKEND_TO_CATEGORY
 import { useAuth } from "@/context/AuthContext";
 
 interface ProfileViewModalProps {
@@ -154,6 +154,7 @@ export const ProfileViewModal = ({ isOpen, onClose, developer, portfolioId }: Pr
         likesCount: portfolio?.likesCount || 0,
         coverPhotoUrl: portfolio?.coverPhotoUrl || null,
         tagline: portfolio?.shortDescription || null, // Short description is now tagline
+        enginePreference: portfolio?.enginePreference || null,
     };
 
     // Prepare the stats array dynamically
@@ -375,6 +376,11 @@ export const ProfileViewModal = ({ isOpen, onClose, developer, portfolioId }: Pr
                                                         {displayData.likesCount > 0 && (
                                                             <span className="flex items-center gap-1 sm:gap-1.5 text-[10px] sm:text-xs text-gray-400 font-mono bg-white/5 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded">
                                                                 <Heart className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-red-500" fill="currentColor" /> {displayData.likesCount}
+                                                            </span>
+                                                        )}
+                                                        {displayData.enginePreference && (
+                                                            <span className="flex items-center gap-1 sm:gap-1.5 text-[10px] sm:text-xs text-gray-400 font-mono bg-white/5 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded">
+                                                                <Gamepad2 className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-purple-400" /> {displayData.enginePreference}
                                                             </span>
                                                         )}
                                                     </motion.div>
