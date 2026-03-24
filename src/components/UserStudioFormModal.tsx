@@ -9,6 +9,7 @@ import { StudioRequest, StudioCategory, HiringStatus } from "@/types/studio";
 import { MediaUploader } from "@/components/MediaUploader";
 import { mediaUploadService } from "@/services/mediaUploadService";
 import { CustomDropdown } from "@/components/CustomDropdown";
+import { toast } from "./ui/sonner";
 
 interface UserStudioFormModalProps {
   isOpen: boolean;
@@ -260,11 +261,13 @@ export const UserStudioFormModal = ({
   success,
 }: UserStudioFormModalProps) => {
   const [formData, setFormData] = useState<StudioRequest>(initialFormData);
+  const [employeeCountInput, setEmployeeCountInput] = useState("10");
 
   // Reset form when modal opens
   useEffect(() => {
     if (isOpen) {
       setFormData(initialFormData);
+      setEmployeeCountInput(String(initialFormData.employeesCount));
     }
   }, [isOpen]);
 
@@ -296,6 +299,66 @@ export const UserStudioFormModal = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!formData.studioName?.trim()) {
+      toast.error("Studio name is required");
+      return;
+    }
+    if (!formData.studioLogoUrl?.trim()) {
+      toast.error("Studio logo is required");
+      return;
+    }
+    if (!formData.studioWebsiteUrl?.trim()) {
+      toast.error("Website URL is required");
+      return;
+    }
+    if (!formData.studioDescription?.trim()) {
+      toast.error("Short description is required");
+      return;
+    }
+    if (!formData.description?.trim()) {
+      toast.error("Full description is required");
+      return;
+    }
+    if (!formData.country?.trim()) {
+      toast.error("Country is required");
+      return;
+    }
+    if (!formData.city?.trim()) {
+      toast.error(isIndia ? "State is required" : "City is required");
+      return;
+    }
+    if (!formData.employeesCount || formData.employeesCount < 1) {
+      toast.error("Please enter a valid employee count");
+      return;
+    }
+    if (!formData.category) {
+      toast.error("Studio category is required");
+      return;
+    }
+    if (!formData.hiringStatus) {
+      toast.error("Hiring status is required");
+      return;
+    }
+    if (!formData.studioEmail?.trim()) {
+      toast.error("Studio email is required");
+      return;
+    }
+    if (!formData.studioMobile?.trim()) {
+      toast.error("Studio mobile is required");
+      return;
+    }
+    if (!formData.youtubeUrl?.trim()) {
+      toast.error("Steam/PlayStore URL is required");
+      return;
+    }
+    if (!formData.linkedinUrl?.trim()) {
+      toast.error("LinkedIn URL is required");
+      return;
+    }
+    if (!formData.discordUrl?.trim()) {
+      toast.error("Discord URL is required");
+      return;
+    }
     await onSubmit({ ...formData, status: "PENDING" });
   };
 
@@ -461,7 +524,7 @@ export const UserStudioFormModal = ({
                     {/* Logo Upload */}
                     <div className="space-y-2 md:col-span-2">
                       <label className="text-sm font-bold text-gray-300 uppercase">
-                        Studio Logo
+                        Studio Logo *
                       </label>
                       <MediaUploader
                         accept="image"
@@ -477,10 +540,11 @@ export const UserStudioFormModal = ({
                     <div className="space-y-2 md:col-span-2">
                       <label className="text-sm font-bold text-gray-300 uppercase flex items-center gap-2">
                         <Globe className="w-4 h-4 text-primary" />
-                        Website URL
+                        Website URL *
                       </label>
                       <input
                         type="url"
+                        required
                         value={formData.studioWebsiteUrl}
                         onChange={(e) =>
                           updateField("studioWebsiteUrl", e.target.value)
@@ -493,10 +557,11 @@ export const UserStudioFormModal = ({
                     {/* Short Description */}
                     <div className="space-y-2 md:col-span-2">
                       <label className="text-sm font-bold text-gray-300 uppercase">
-                        Short Description
+                        Short Description (Max 255 words)*
                       </label>
                       <input
                         type="text"
+                        required
                         value={formData.studioDescription}
                         onChange={(e) =>
                           updateField("studioDescription", e.target.value)
@@ -510,9 +575,10 @@ export const UserStudioFormModal = ({
                     {/* Full Description */}
                     <div className="space-y-2 md:col-span-2">
                       <label className="text-sm font-bold text-gray-300 uppercase">
-                        Full Description
+                        Full Description (Max 1000 words)*
                       </label>
                       <textarea
+                        required
                         rows={4}
                         value={formData.description}
                         onChange={(e) =>
@@ -520,6 +586,7 @@ export const UserStudioFormModal = ({
                         }
                         className="w-full bg-black/50 border border-white/20 p-3 rounded-lg text-white focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-mono resize-none"
                         placeholder="Tell us about your studio, the games you've made, your team culture..."
+                        maxLength={1000}
                       />
                     </div>
                   </div>
@@ -560,7 +627,7 @@ export const UserStudioFormModal = ({
                     <div className="space-y-2">
                       <label className="text-sm font-bold text-gray-300 uppercase flex items-center gap-2">
                         <MapPin className="w-4 h-4 text-primary" />
-                        {isIndia ? "State *" : "City"}
+                        {isIndia ? "State *" : "City *"}
                       </label>
                       {isIndia ? (
                         <CustomDropdown
@@ -583,7 +650,7 @@ export const UserStudioFormModal = ({
                     </div>
 
                     {/* Auto-filled Coordinates Info */}
-                    <div className="md:col-span-2 p-3 bg-primary/5 border border-primary/20 rounded-lg">
+                    {/* <div className="md:col-span-2 p-3 bg-primary/5 border border-primary/20 rounded-lg">
                       <div className="flex items-center gap-2 text-xs text-gray-400 mb-2">
                         <MapPin className="w-3 h-3 text-primary" />
                         <span>Coordinates (Auto-filled based on location)</span>
@@ -602,7 +669,7 @@ export const UserStudioFormModal = ({
                           </span>
                         </div>
                       </div>
-                    </div>
+                    </div> */}
                   </div>
                 </div>
 
@@ -622,42 +689,44 @@ export const UserStudioFormModal = ({
                       </label>
                       <div className="relative">
                         <input
-                          type="number"
-                          min="1"
+                          type="text"
+                          inputMode="numeric"
+                          pattern="[0-9]*"
                           required
-                          value={
-                            formData.employeesCount === 1
-                              ? ""
-                              : formData.employeesCount
-                          }
+                          value={employeeCountInput}
                           onChange={(e) => {
-                            const value = e.target.value;
-                            if (value === "") {
-                              updateField("employeesCount", 1);
-                            } else {
-                              const numValue = parseInt(value);
-                              if (!isNaN(numValue) && numValue >= 1) {
-                                updateField("employeesCount", numValue);
-                              }
+                            const raw = e.target.value;
+                            // Allow empty (user clearing field)
+                            if (raw === "") {
+                              setEmployeeCountInput("");
+                              return;
+                            }
+                            // Only allow digits
+                            if (!/^\d+$/.test(raw)) return;
+                            setEmployeeCountInput(raw);
+                            const numValue = parseInt(raw, 10);
+                            if (numValue >= 1 && numValue <= 100000) {
+                              updateField("employeesCount", numValue);
                             }
                           }}
-                          onBlur={(e) => {
-                            if (e.target.value === "") {
+                          onBlur={() => {
+                            const num = parseInt(employeeCountInput, 10);
+                            if (!employeeCountInput || isNaN(num) || num < 1) {
+                              setEmployeeCountInput("1");
                               updateField("employeesCount", 1);
                             }
                           }}
                           className="w-full bg-black/50 border border-white/20 p-3 rounded-lg text-white focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-mono [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                          placeholder="50"
+                          placeholder="e.g., 50"
                         />
                         <div className="absolute right-3 top-1/2 transform -translate-y-1/2 flex flex-col">
                           <button
                             type="button"
-                            onClick={() =>
-                              updateField(
-                                "employeesCount",
-                                Math.min(10000, formData.employeesCount + 1)
-                              )
-                            }
+                            onClick={() => {
+                              const next = Math.min(100000, formData.employeesCount + 1);
+                              updateField("employeesCount", next);
+                              setEmployeeCountInput(String(next));
+                            }}
                             className="text-primary hover:text-white w-4 h-4 flex items-center justify-center"
                           >
                             <svg
@@ -676,12 +745,11 @@ export const UserStudioFormModal = ({
                           </button>
                           <button
                             type="button"
-                            onClick={() =>
-                              updateField(
-                                "employeesCount",
-                                Math.max(1, formData.employeesCount - 1)
-                              )
-                            }
+                            onClick={() => {
+                              const next = Math.max(1, formData.employeesCount - 1);
+                              updateField("employeesCount", next);
+                              setEmployeeCountInput(String(next));
+                            }}
                             className="text-primary hover:text-white w-4 h-4 flex items-center justify-center"
                           >
                             <svg
@@ -738,7 +806,7 @@ export const UserStudioFormModal = ({
                     <div className="space-y-2">
                       <label className="text-sm font-bold text-gray-300 uppercase flex items-center gap-2">
                         <Briefcase className="w-4 h-4 text-primary" />
-                        Studio Category
+                        Studio Category *
                       </label>
                       <CustomDropdown
                         value={formData.category || ""}
@@ -756,7 +824,7 @@ export const UserStudioFormModal = ({
                     <div className="space-y-2">
                       <label className="text-sm font-bold text-gray-300 uppercase flex items-center gap-2">
                         <Users className="w-4 h-4 text-primary" />
-                        Hiring Status
+                        Hiring Status *
                       </label>
                       <CustomDropdown
                         value={formData.hiringStatus || "NOT_HIRING"}
@@ -785,10 +853,11 @@ export const UserStudioFormModal = ({
                     <div className="space-y-2">
                       <label className="text-sm font-bold text-gray-300 uppercase flex items-center gap-2">
                         <Mail className="w-4 h-4 text-primary" />
-                        Studio Email
+                        Studio Email *
                       </label>
                       <input
                         type="email"
+                        required
                         value={formData.studioEmail || ""}
                         onChange={(e) => updateField("studioEmail", e.target.value)}
                         className="w-full bg-black/50 border border-white/20 p-3 rounded-lg text-white focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-mono"
@@ -800,10 +869,11 @@ export const UserStudioFormModal = ({
                     <div className="space-y-2">
                       <label className="text-sm font-bold text-gray-300 uppercase flex items-center gap-2">
                         <Phone className="w-4 h-4 text-primary" />
-                        Studio Mobile
+                        Studio Mobile *
                       </label>
                       <input
                         type="tel"
+                        required
                         value={formData.studioMobile || ""}
                         onChange={(e) => updateField("studioMobile", e.target.value)}
                         className="w-full bg-black/50 border border-white/20 p-3 rounded-lg text-white focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-mono"
@@ -815,10 +885,11 @@ export const UserStudioFormModal = ({
                     <div className="space-y-2">
                       <label className="text-sm font-bold text-gray-300 uppercase flex items-center gap-2">
                         <Youtube className="w-4 h-4 text-red-500" />
-                        Steam/PlayStore Channel
+                        Steam/PlayStore Channel *
                       </label>
                       <input
                         type="url"
+                        required
                         value={formData.youtubeUrl || ""}
                         onChange={(e) => updateField("youtubeUrl", e.target.value)}
                         className="w-full bg-black/50 border border-white/20 p-3 rounded-lg text-white focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-mono"
@@ -830,7 +901,7 @@ export const UserStudioFormModal = ({
                     <div className="space-y-2">
                       <label className="text-sm font-bold text-gray-300 uppercase flex items-center gap-2">
                         <Linkedin className="w-4 h-4 text-blue-500" />
-                        LinkedIn
+                        LinkedIn *
                       </label>
                       <input
                         type="url"
@@ -860,10 +931,11 @@ export const UserStudioFormModal = ({
                     <div className="space-y-2">
                       <label className="text-sm font-bold text-gray-300 uppercase flex items-center gap-2">
                         <MessageCircle className="w-4 h-4 text-indigo-500" />
-                        Discord Server
+                        Discord Server *
                       </label>
                       <input
                         type="url"
+                        required
                         value={formData.discordUrl || ""}
                         onChange={(e) => updateField("discordUrl", e.target.value)}
                         className="w-full bg-black/50 border border-white/20 p-3 rounded-lg text-white focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-mono"
@@ -890,9 +962,22 @@ export const UserStudioFormModal = ({
                     type="submit"
                     disabled={
                       isSubmitting ||
-                      !formData.studioName ||
-                      !formData.country ||
-                      (isIndia && !formData.city)
+                      !formData.studioName?.trim() ||
+                      !formData.studioLogoUrl?.trim() ||
+                      !formData.studioWebsiteUrl?.trim() ||
+                      !formData.studioDescription?.trim() ||
+                      !formData.description?.trim() ||
+                      !formData.country?.trim() ||
+                      !formData.city?.trim() ||
+                      !formData.employeesCount ||
+                      formData.employeesCount < 1 ||
+                      !formData.category ||
+                      !formData.hiringStatus ||
+                      !formData.studioEmail?.trim() ||
+                      !formData.studioMobile?.trim() ||
+                      !formData.youtubeUrl?.trim() ||
+                      !formData.linkedinUrl?.trim() ||
+                      !formData.discordUrl?.trim()
                     }
                     className="px-8 py-3 bg-primary text-black font-bold uppercase tracking-widest hover:bg-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 rounded-lg relative overflow-hidden group"
                   >

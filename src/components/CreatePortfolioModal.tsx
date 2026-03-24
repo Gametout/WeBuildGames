@@ -205,22 +205,32 @@ const PlatformDropdown = ({
 // Role Dropdown Component
 const RoleDropdown = ({ value, onChange }: { value: string; onChange: (value: string) => void }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const [search, setSearch] = useState("");
 
   const selectedRole = roles.find(r => r === value);
+
+  const filteredRoles = search.trim()
+    ? roles.filter(r => r.toLowerCase().includes(search.toLowerCase().trim()))
+    : roles;
+
+  // Reset search when dropdown closes
+  useEffect(() => {
+    if (!isOpen) setSearch("");
+  }, [isOpen]);
 
   return (
     <div className="relative w-full">
       <motion.button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className={`w-full bg-[#0a0a0a] border border-white/20 p-3 rounded-sm text-white focus:border-[#FFAB00] transition-colors font-mono flex items-center justify-between ${isOpen ? 'border-[#FFAB00]' : ''
-          }`}
+        className={`w-full bg-[#0a0a0a] border border-white/20 p-3 rounded-sm text-white focus:border-[#FFAB00] transition-colors font-mono flex items-center justify-between ${isOpen ? 'border-[#FFAB00]' : ''}`}
         whileTap={{ scale: 0.98 }}
       >
-        <span className="uppercase">{selectedRole || "Select Role"}</span>
+        <span className="uppercase truncate">{selectedRole || "Select Role"}</span>
         <motion.div
           animate={{ rotate: isOpen ? 180 : 0 }}
           transition={{ duration: 0.2 }}
+          className="flex-shrink-0 ml-2"
         >
           <ChevronDown className="w-4 h-4 text-gray-400" />
         </motion.div>
@@ -238,42 +248,158 @@ const RoleDropdown = ({ value, onChange }: { value: string; onChange: (value: st
               onClick={() => setIsOpen(false)}
             />
 
-            {/* Dropdown - opens below */}
+            {/* Dropdown */}
             <motion.div
               initial={{ opacity: 0, y: -10, scale: 0.95 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: -10, scale: 0.95 }}
-              className="absolute top-full left-0 right-0 mt-2 bg-[#0a0a0a] border border-[#FFAB00]/30 rounded-lg shadow-2xl max-h-60 overflow-y-auto"
+              className="absolute top-full left-0 right-0 mt-2 bg-[#0a0a0a] border border-[#FFAB00]/30 rounded-lg shadow-2xl overflow-hidden"
               style={{
                 boxShadow: '0 10px 50px rgba(0,0,0,0.8), 0 0 20px rgba(255,171,0,0.1)',
                 zIndex: 50
               }}
             >
-              {roles.map((role) => (
-                <motion.button
-                  key={role}
-                  type="button"
-                  onClick={() => {
-                    onChange(role);
-                    setIsOpen(false);
-                  }}
-                  className={`w-full px-4 py-3 text-left text-sm hover:bg-white/10 transition-colors flex items-center gap-2 ${value === role
-                    ? 'bg-[#FFAB00]/20 text-[#FFAB00] font-bold'
-                    : 'text-gray-300'
-                    }`}
-                  whileHover={{ x: 4 }}
-                >
-                  <span className="uppercase">{role}</span>
-                  {value === role && (
-                    <CheckCircle className="w-4 h-4 ml-auto" />
-                  )}
-                </motion.button>
-              ))}
+              {/* Search Bar */}
+              <div className="sticky top-0 bg-[#0a0a0a] border-b border-white/10 p-2 z-10">
+                <div className="relative">
+                  <svg
+                    className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-500 pointer-events-none"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                    />
+                  </svg>
+                  <input
+                    type="text"
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    placeholder="Search roles..."
+                    className="w-full bg-white/5 border border-white/10 rounded-md text-sm text-white placeholder:text-gray-600 pl-8 pr-8 py-2 font-mono focus:border-[#FFAB00]/50 focus:outline-none focus:ring-1 focus:ring-[#FFAB00]/20 transition-all"
+                    autoFocus
+                    onClick={(e) => e.stopPropagation()}
+                  />
+                  <AnimatePresence>
+                    {search && (
+                      <motion.button
+                        initial={{ opacity: 0, scale: 0.5 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0.5 }}
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setSearch("");
+                        }}
+                        className="absolute right-2 top-1/2 -translate-y-1/2 p-0.5 rounded-full hover:bg-white/10 text-gray-500 hover:text-gray-300 transition-colors"
+                      >
+                        <X className="w-3.5 h-3.5" />
+                      </motion.button>
+                    )}
+                  </AnimatePresence>
+                </div>
+                {search.trim() && (
+                  <p className="text-[10px] text-gray-500 font-mono mt-1.5 px-1">
+                    {filteredRoles.length} result{filteredRoles.length !== 1 ? "s" : ""}
+                  </p>
+                )}
+              </div>
+
+              {/* Role List */}
+              <div className="max-h-52 overflow-y-auto">
+                {filteredRoles.length > 0 ? (
+                  filteredRoles.map((role) => (
+                    <motion.button
+                      key={role}
+                      type="button"
+                      onClick={() => {
+                        onChange(role);
+                        setIsOpen(false);
+                      }}
+                      className={`w-full px-4 py-3 text-left text-sm hover:bg-white/10 transition-colors flex items-center gap-2 ${value === role
+                        ? 'bg-[#FFAB00]/20 text-[#FFAB00] font-bold'
+                        : 'text-gray-300'
+                        }`}
+                      whileHover={{ x: 4 }}
+                    >
+                      <span className="uppercase flex-1 truncate">
+                        {search.trim() ? (
+                          <RoleHighlight text={role} query={search.trim()} />
+                        ) : (
+                          role
+                        )}
+                      </span>
+                      {value === role && (
+                        <CheckCircle className="w-4 h-4 flex-shrink-0" />
+                      )}
+                    </motion.button>
+                  ))
+                ) : (
+                  <div className="py-8 flex flex-col items-center justify-center gap-2 px-4">
+                    <svg
+                      className="w-5 h-5 text-gray-600"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                      />
+                    </svg>
+                    <p className="text-xs text-gray-500 font-mono text-center">
+                      No roles match "<span className="text-gray-400">{search}</span>"
+                    </p>
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setSearch("");
+                      }}
+                      className="text-[11px] text-[#FFAB00] hover:underline font-mono mt-1"
+                    >
+                      Clear search
+                    </button>
+                  </div>
+                )}
+              </div>
             </motion.div>
           </>
         )}
       </AnimatePresence>
     </div>
+  );
+};
+
+// Highlight matching text in role search
+const RoleHighlight = ({ text, query }: { text: string; query: string }) => {
+  if (!query) return <>{text}</>;
+  const regex = new RegExp(
+    `(${query.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")})`,
+    "gi"
+  );
+  const parts = text.split(regex);
+  return (
+    <>
+      {parts.map((part, i) =>
+        regex.test(part) ? (
+          <span
+            key={i}
+            className="text-[#FFAB00] bg-[#FFAB00]/10 rounded-sm px-0.5"
+          >
+            {part}
+          </span>
+        ) : (
+          <span key={i}>{part}</span>
+        )
+      )}
+    </>
   );
 };
 
@@ -707,30 +833,30 @@ export const CreatePortfolioModal = ({ isOpen, onClose, onSuccess, initialData, 
   const handleProfilePhotoUpload = useCallback(async (file: File) => {
     handleProfilePhotoSelect(file);
     // Return placeholder result - actual upload happens in handleCroppedImage
-    return { 
-      objectKey: "", 
-      publicUrl: "", 
-      metadata: { 
-        originalFilename: file.name, 
+    return {
+      objectKey: "",
+      publicUrl: "",
+      metadata: {
+        originalFilename: file.name,
         contentType: file.type,
         size: file.size,
         uploadDate: new Date()
-      } 
+      }
     };
   }, [handleProfilePhotoSelect]);
 
   const handleCoverPhotoUpload = useCallback(async (file: File) => {
     handleCoverPhotoSelect(file);
     // Return placeholder result - actual upload happens in handleCroppedImage
-    return { 
-      objectKey: "", 
-      publicUrl: "", 
-      metadata: { 
-        originalFilename: file.name, 
+    return {
+      objectKey: "",
+      publicUrl: "",
+      metadata: {
+        originalFilename: file.name,
         contentType: file.type,
         size: file.size,
         uploadDate: new Date()
-      } 
+      }
     };
   }, [handleCoverPhotoSelect]);
 
@@ -1407,16 +1533,30 @@ export const CreatePortfolioModal = ({ isOpen, onClose, onSuccess, initialData, 
                           key={index}
                           initial={{ opacity: 0, x: -10 }}
                           animate={{ opacity: 1, x: 0 }}
-                          className="flex gap-4 items-center bg-white/5 p-3 rounded border border-white/5"
+                          className="bg-white/5 p-3 rounded border border-white/5 space-y-3"
                         >
-                          <input
-                            type="text"
-                            placeholder="SKILL_NAME (e.g. UNITY)"
-                            className="bg-transparent border-b border-white/20 text-white text-sm w-1/3 focus:border-[#FFAB00] focus:outline-none font-mono py-1"
-                            value={skill.name}
-                            onChange={(e) => handleSkillChange(index, "name", e.target.value)}
-                          />
-                          <div className="flex-1 flex items-center gap-2">
+                          {/* Row 1: Skill name + delete */}
+                          <div className="flex items-center gap-3">
+                            <input
+                              type="text"
+                              placeholder="SKILL_NAME (e.g. UNITY)"
+                              className="flex-1 bg-transparent border-b border-white/20 text-white text-sm focus:border-[#FFAB00] focus:outline-none font-mono py-1"
+                              value={skill.name}
+                              onChange={(e) => handleSkillChange(index, "name", e.target.value)}
+                            />
+                            {index > 0 && (
+                              <button
+                                type="button"
+                                onClick={() => handleRemoveSkill(index)}
+                                className="text-red-500 hover:text-red-400 flex-shrink-0"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </button>
+                            )}
+                          </div>
+
+                          {/* Row 2: Skill level buttons — always full width, wraps naturally */}
+                          <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
                             {SKILL_LEVEL_OPTIONS.map((option) => {
                               const active = scoreToSkillLevel(skill.score) === option.value;
                               return (
@@ -1424,22 +1564,16 @@ export const CreatePortfolioModal = ({ isOpen, onClose, onSuccess, initialData, 
                                   key={option.value}
                                   type="button"
                                   onClick={() => handleSkillLevelChange(index, option.value)}
-                                  className={`px-2.5 py-1.5 rounded-md text-[11px] font-bold uppercase tracking-wide border transition-all ${
-                                    active
+                                  className={`px-2 py-1.5 sm:px-2.5 rounded-md text-[10px] sm:text-[11px] font-bold uppercase tracking-wide border transition-all flex-1 min-w-0 text-center ${active
                                       ? "bg-[#FFAB00] text-black border-[#FFAB00] shadow-[0_0_12px_rgba(255,171,0,0.35)]"
                                       : "bg-white/5 text-gray-300 border-white/15 hover:border-[#FFAB00]/40"
-                                  }`}
+                                    }`}
                                 >
                                   {option.label}
                                 </button>
                               );
                             })}
                           </div>
-                          {index > 0 && (
-                            <button type="button" onClick={() => handleRemoveSkill(index)} className="text-red-500 hover:text-red-400">
-                              <Trash2 className="w-4 h-4" />
-                            </button>
-                          )}
                         </motion.div>
                       ))}
                     </div>
