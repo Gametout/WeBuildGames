@@ -12,6 +12,7 @@ import {
   DISPLAY_TO_STATUS, PortfolioDetail, BACKEND_TO_CATEGORY, GameEngine
 } from "@/types/portfolio";
 import { MediaUploader } from "@/components/MediaUploader";
+import { ImageCropper } from "@/components/ImageCropper";
 import { mediaUploadService } from "@/services/mediaUploadService";
 import { toast } from "./ui/sonner";
 import {
@@ -22,6 +23,7 @@ import {
   type SkillLevel,
 } from "@/utils/skillLevel";
 import { addDiagonalWatermarkToPdf } from "@/utils/pdfWatermark";
+import { ValidationErrorDisplay, validatePortfolioForm, ValidationError, fieldErrorVariants } from "@/utils/formValidation.tsx";
 
 interface UpdatePortfolioModalProps {
   isOpen: boolean;
@@ -418,6 +420,14 @@ export const UpdatePortfolioModal = ({
   const [uploadingPhoto, setUploadingPhoto] = useState<"profile" | "cover" | null>(null);
   const [deletingResume, setDeletingResume] = useState(false);
 
+  // Image Cropper States
+  const [cropperOpen, setCropperOpen] = useState<false | "profile" | "cover">(false);
+  const [imageToCrop, setImageToCrop] = useState<string>("");
+  const [pendingPhotoType, setPendingPhotoType] = useState<"profile" | "cover" | null>(null);
+
+  // Validation Errors State
+  const [validationErrors, setValidationErrors] = useState<ValidationError[]>([]);
+
   // Initialize form with initial data
   useEffect(() => {
     if (isOpen && initialData) {
@@ -513,35 +523,87 @@ export const UpdatePortfolioModal = ({
     setFormData({ ...formData, socials: newSocials });
   };
 
-  const handleProfilePhotoUpload = useCallback(async (file: File) => {
-    setUploadingPhoto("profile");
-    try {
-      const result = await mediaUploadService.uploadFile(file, false);
-      setFormData(prev => ({ ...prev, profilePhotoUrl: result.publicUrl }));
-      toast.success("Profile photo uploaded successfully");
-      return result;
-    } catch (error) {
-      toast.error("Failed to upload profile photo");
-      throw error;
-    } finally {
-      setUploadingPhoto(null);
-    }
+  const handleProfilePhotoSelect = useCallback((file: File) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      setImageToCrop(e.target?.result as string);
+      setPendingPhotoType("profile");
+      setCropperOpen("profile");
+    };
+    reader.readAsDataURL(file);
   }, []);
 
-  const handleCoverPhotoUpload = useCallback(async (file: File) => {
-    setUploadingPhoto("cover");
-    try {
-      const result = await mediaUploadService.uploadFile(file, false);
-      setFormData(prev => ({ ...prev, coverPhotoUrl: result.publicUrl }));
-      toast.success("Cover photo uploaded successfully");
-      return result;
-    } catch (error) {
-      toast.error("Failed to upload cover photo");
-      throw error;
-    } finally {
-      setUploadingPhoto(null);
-    }
+  const handleCoverPhotoSelect = useCallback((file: File) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      setImageToCrop(e.target?.result as string);
+      setPendingPhotoType("cover");
+      setCropperOpen("cover");
+    };
+    reader.readAsDataURL(file);
   }, []);
+
+  const handleCroppedImage = useCallback(
+    async (croppedBlob: Blob) => {
+      try {
+        // Upload the cropped image
+        const croppedFile = new File([croppedBlob], "cropped-image.jpg", {
+          type: "image/jpeg",
+        });
+
+        const result = await mediaUploadService.uploadFile(croppedFile, false);
+
+        if (result.publicUrl) {
+          if (pendingPhotoType === "profile") {
+            setFormData((prev) => ({ ...prev, profilePhotoUrl: result.publicUrl }));
+            toast.success("Profile photo updated");
+          } else if (pendingPhotoType === "cover") {
+            setFormData((prev) => ({ ...prev, coverPhotoUrl: result.publicUrl }));
+            toast.success("Cover photo updated");
+          }
+        }
+
+        // Close cropper and reset
+        setCropperOpen(false);
+        setImageToCrop("");
+        setPendingPhotoType(null);
+      } catch (error) {
+        console.error("Error uploading cropped image:", error);
+        toast.error("Failed to upload cropped image");
+      }
+    },
+    [pendingPhotoType]
+  );
+
+  const handleProfilePhotoUpload = useCallback(async (file: File) => {
+    handleProfilePhotoSelect(file);
+    // Return placeholder result - actual upload happens in handleCroppedImage
+    return { 
+      objectKey: "", 
+      publicUrl: "", 
+      metadata: { 
+        originalFilename: file.name, 
+        contentType: file.type,
+        size: file.size,
+        uploadDate: new Date()
+      } 
+    };
+  }, [handleProfilePhotoSelect]);
+
+  const handleCoverPhotoUpload = useCallback(async (file: File) => {
+    handleCoverPhotoSelect(file);
+    // Return placeholder result - actual upload happens in handleCroppedImage
+    return { 
+      objectKey: "", 
+      publicUrl: "", 
+      metadata: { 
+        originalFilename: file.name, 
+        contentType: file.type,
+        size: file.size,
+        uploadDate: new Date()
+      } 
+    };
+  }, [handleCoverPhotoSelect]);
 
   const handleResumeUpload = useCallback(async (file: File) => {
     try {
@@ -617,19 +679,26 @@ export const UpdatePortfolioModal = ({
       return;
     }
 
-    // Validate required fields
-    if (!formData.name || !formData.name.trim()) {
-      toast.error("Name is required");
+    // Clear previous errors
+    setValidationErrors([]);
+
+    // Validate using new validation utility
+    const errors = validatePortfolioForm(formData);
+
+    if (errors.length > 0) {
+      setValidationErrors(errors);
+      // Scroll to top to show errors
+      setTimeout(() => {
+        const form = document.querySelector("form");
+        form?.scroll({ top: 0, behavior: "smooth" });
+      }, 100);
       return;
     }
-    if (!formData.location || !formData.location.trim()) {
-      toast.error("Location is required");
-      return;
-    }
-    if (!formData.contactEmail || !formData.contactEmail.trim()) {
-      toast.error("Contact email is required");
-      return;
-    }
+
+    // Helper to convert empty strings to undefined
+    const clean = (value: string | undefined): string | undefined => {
+      return value && value.trim() !== "" ? value.trim() : undefined;
+    };
 
     const cleanedExperience = formData.experienceYears === -1 ? 0 : formData.experienceYears;
 
@@ -703,6 +772,19 @@ export const UpdatePortfolioModal = ({
               {/* Scrollable Content */}
               <div className="flex-1 overflow-y-auto custom-scrollbar">
                 <form onSubmit={handleSubmit} className="p-6 space-y-8">
+
+                  {/* Validation Errors Display */}
+                  <AnimatePresence>
+                    {validationErrors.length > 0 && (
+                      <motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: "auto" }}
+                        exit={{ opacity: 0, height: 0 }}
+                      >
+                        <ValidationErrorDisplay errors={validationErrors} />
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
 
                   {/* Basic Info Section */}
                   <div className="space-y-4">
@@ -1080,6 +1162,37 @@ export const UpdatePortfolioModal = ({
               </div>
             </motion.div>
           </div>
+
+          {/* Image Cropper Modal */}
+          <ImageCropper
+            isOpen={cropperOpen === "profile"}
+            imageSrc={imageToCrop}
+            aspect={1}
+            cropShape="rect"
+            title="Crop Profile Photo"
+            description="Adjust your photo to fit a square format (1:1). You can zoom and rotate as needed."
+            onCrop={handleCroppedImage}
+            onClose={() => {
+              setCropperOpen(false);
+              setImageToCrop("");
+              setPendingPhotoType(null);
+            }}
+          />
+
+          <ImageCropper
+            isOpen={cropperOpen === "cover"}
+            imageSrc={imageToCrop}
+            aspect={16 / 9}
+            cropShape="rect"
+            title="Crop Cover Photo"
+            description="Adjust your cover photo to fit a widescreen format (16:9). You can zoom and rotate as needed."
+            onCrop={handleCroppedImage}
+            onClose={() => {
+              setCropperOpen(false);
+              setImageToCrop("");
+              setPendingPhotoType(null);
+            }}
+          />
         </>
       )}
     </AnimatePresence>

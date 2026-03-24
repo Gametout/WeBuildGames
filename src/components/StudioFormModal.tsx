@@ -7,6 +7,7 @@ import {
 import { Studio, StudioRequest } from "@/types/studio";
 import { MediaUploader } from "@/components/MediaUploader";
 import { mediaUploadService } from "@/services/mediaUploadService";
+import { ValidationErrorDisplay, validateStudioForm, ValidationError } from "@/utils/formValidation.tsx";
 
 interface StudioFormModalProps {
   isOpen: boolean;
@@ -46,6 +47,7 @@ export const StudioFormModal = ({
 }: StudioFormModalProps) => {
   const [formData, setFormData] = useState<StudioRequest>(initialFormData);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [validationErrors, setValidationErrors] = useState<ValidationError[]>([]);
 
   const isEditMode = !!studio;
 
@@ -87,6 +89,23 @@ export const StudioFormModal = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Clear previous errors
+    setValidationErrors([]);
+
+    // Validate using new validation utility
+    const errors = validateStudioForm(formData);
+
+    if (errors.length > 0) {
+      setValidationErrors(errors);
+      // Scroll to top to show errors
+      setTimeout(() => {
+        const form = document.querySelector("form");
+        form?.scroll({ top: 0, behavior: "smooth" });
+      }, 100);
+      return;
+    }
+
     await onSubmit(formData);
   };
 
@@ -148,6 +167,19 @@ export const StudioFormModal = ({
               {/* Form Content */}
               <form onSubmit={handleSubmit} className="p-6 space-y-6">
                 
+                {/* Validation Errors Display */}
+                <AnimatePresence>
+                  {validationErrors.length > 0 && (
+                    <motion.div
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: "auto" }}
+                      exit={{ opacity: 0, height: 0 }}
+                    >
+                      <ValidationErrorDisplay errors={validationErrors} />
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+
                 {/* Status Messages */}
                 <AnimatePresence>
                   {success && (
@@ -371,8 +403,18 @@ export const StudioFormModal = ({
                         type="number"
                         min="1"
                         required
-                        value={formData.employeesCount}
-                        onChange={(e) => updateField("employeesCount", parseInt(e.target.value) || 1)}
+                        value={formData.employeesCount || ""}
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          if (value === "") {
+                            updateField("employeesCount", 1);
+                          } else {
+                            const parsed = parseInt(value, 10);
+                            if (!isNaN(parsed) && parsed >= 1) {
+                              updateField("employeesCount", parsed);
+                            }
+                          }
+                        }}
                         className="w-full bg-black/50 border border-white/20 p-3 rounded-sm text-white focus:border-[#FFAB00] focus:outline-none transition-colors font-mono"
                         placeholder="50"
                       />

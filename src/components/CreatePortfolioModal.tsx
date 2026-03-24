@@ -9,6 +9,7 @@ import { usePortfolioMutation } from "@/hooks/usePortfolioDetail";
 import { useAuth } from "@/context/AuthContext";
 import { JobCategory, JobProfileStatus, PortfolioRequest, CATEGORY_TO_BACKEND, DISPLAY_TO_STATUS, PortfolioDetail, BACKEND_TO_CATEGORY, GameEngine } from "@/types/portfolio";
 import { MediaUploader } from "@/components/MediaUploader";
+import { ImageCropper } from "@/components/ImageCropper";
 import { mediaUploadService } from "@/services/mediaUploadService";
 import { portfolioService } from "@/services/portfolioService";
 import React from "react";
@@ -21,6 +22,7 @@ import {
   type SkillLevel,
 } from "@/utils/skillLevel";
 import { addDiagonalWatermarkToPdf } from "@/utils/pdfWatermark";
+import { ValidationErrorDisplay, validatePortfolioForm, ValidationError, fieldErrorVariants } from "@/utils/formValidation.tsx";
 
 interface CreatePortfolioModalProps {
   isOpen: boolean;
@@ -83,7 +85,7 @@ const engineToEnum: Record<string, GameEngine> = {
 
 
 const MAX_SHORT_DESCRIPTION = 100;
-const MAX_PROFILE_SUMMARY = 500;
+const MAX_PROFILE_SUMMARY = 1000;
 const MAX_RESUME_SIZE_BYTES = 10 * 1024 * 1024;
 
 // Platform options with icons
@@ -476,6 +478,14 @@ export const CreatePortfolioModal = ({ isOpen, onClose, onSuccess, initialData, 
     socials: [{ platform: "", url: "" }]
   });
 
+  // Image Cropper States
+  const [cropperOpen, setCropperOpen] = useState<false | "profile" | "cover">(false);
+  const [imageToCrop, setImageToCrop] = useState<string>("");
+  const [pendingPhotoType, setPendingPhotoType] = useState<"profile" | "cover" | null>(null);
+
+  // Validation Errors State
+  const [validationErrors, setValidationErrors] = useState<ValidationError[]>([]);
+
   useEffect(() => {
     if (isOpen && initialData) {
       // Map API response back to Form State
@@ -642,13 +652,87 @@ export const CreatePortfolioModal = ({ isOpen, onClose, onSuccess, initialData, 
   };
 
   // Handle file uploads via presigned URLs
-  const handleProfilePhotoUpload = useCallback(async (file: File) => {
-    return await mediaUploadService.uploadFile(file, false);
+  const handleProfilePhotoSelect = useCallback((file: File) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      setImageToCrop(e.target?.result as string);
+      setPendingPhotoType("profile");
+      setCropperOpen("profile");
+    };
+    reader.readAsDataURL(file);
   }, []);
 
-  const handleCoverPhotoUpload = useCallback(async (file: File) => {
-    return await mediaUploadService.uploadFile(file, false);
+  const handleCoverPhotoSelect = useCallback((file: File) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      setImageToCrop(e.target?.result as string);
+      setPendingPhotoType("cover");
+      setCropperOpen("cover");
+    };
+    reader.readAsDataURL(file);
   }, []);
+
+  const handleCroppedImage = useCallback(
+    async (croppedBlob: Blob) => {
+      try {
+        // Upload the cropped image
+        const croppedFile = new File([croppedBlob], "cropped-image.jpg", {
+          type: "image/jpeg",
+        });
+
+        const result = await mediaUploadService.uploadFile(croppedFile, false);
+
+        if (result.publicUrl) {
+          if (pendingPhotoType === "profile") {
+            setFormData((prev) => ({ ...prev, profilePhotoUrl: result.publicUrl }));
+            toast.success("Profile photo updated");
+          } else if (pendingPhotoType === "cover") {
+            setFormData((prev) => ({ ...prev, coverPhotoUrl: result.publicUrl }));
+            toast.success("Cover photo updated");
+          }
+        }
+
+        // Close cropper and reset
+        setCropperOpen(false);
+        setImageToCrop("");
+        setPendingPhotoType(null);
+      } catch (error) {
+        console.error("Error uploading cropped image:", error);
+        toast.error("Failed to upload cropped image");
+      }
+    },
+    [pendingPhotoType]
+  );
+
+  const handleProfilePhotoUpload = useCallback(async (file: File) => {
+    handleProfilePhotoSelect(file);
+    // Return placeholder result - actual upload happens in handleCroppedImage
+    return { 
+      objectKey: "", 
+      publicUrl: "", 
+      metadata: { 
+        originalFilename: file.name, 
+        contentType: file.type,
+        size: file.size,
+        uploadDate: new Date()
+      } 
+    };
+  }, [handleProfilePhotoSelect]);
+
+  const handleCoverPhotoUpload = useCallback(async (file: File) => {
+    handleCoverPhotoSelect(file);
+    // Return placeholder result - actual upload happens in handleCroppedImage
+    return { 
+      objectKey: "", 
+      publicUrl: "", 
+      metadata: { 
+        originalFilename: file.name, 
+        contentType: file.type,
+        size: file.size,
+        uploadDate: new Date()
+      } 
+    };
+  }, [handleCoverPhotoSelect]);
 
   const handleResumeUpload = useCallback(async (file: File) => {
     try {
@@ -720,17 +804,19 @@ export const CreatePortfolioModal = ({ isOpen, onClose, onSuccess, initialData, 
       return;
     }
 
-    // Validate required fields
-    if (!formData.name || !formData.name.trim()) {
-      alert("Name is required");
-      return;
-    }
-    if (!formData.location || !formData.location.trim()) {
-      alert("Location is required");
-      return;
-    }
-    if (!formData.contactEmail || !formData.contactEmail.trim()) {
-      alert("Contact email is required");
+    // Clear previous errors
+    setValidationErrors([]);
+
+    // Validate using new validation utility
+    const errors = validatePortfolioForm(formData);
+
+    if (errors.length > 0) {
+      setValidationErrors(errors);
+      // Scroll to top to show errors
+      setTimeout(() => {
+        const form = document.querySelector("form");
+        form?.scroll({ top: 0, behavior: "smooth" });
+      }, 100);
       return;
     }
 
@@ -1015,6 +1101,19 @@ export const CreatePortfolioModal = ({ isOpen, onClose, onSuccess, initialData, 
               ) : (
                 <form onSubmit={handleSubmit} className="p-6 space-y-8">
 
+                  {/* Validation Errors Display */}
+                  <AnimatePresence>
+                    {validationErrors.length > 0 && (
+                      <motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: "auto" }}
+                        exit={{ opacity: 0, height: 0 }}
+                      >
+                        <ValidationErrorDisplay errors={validationErrors} />
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+
                   {/* Success Message */}
                   {/* {success && (
                     <motion.div
@@ -1190,7 +1289,7 @@ export const CreatePortfolioModal = ({ isOpen, onClose, onSuccess, initialData, 
 
                       <div className="space-y-2 md:col-span-2">
                         <label className="text-sm font-bold text-gray-300 uppercase">
-                          Short Description <span className="text-[10px] text-gray-500 ml-2">({formData.shortDescription.length}/{MAX_SHORT_DESCRIPTION})</span>
+                          Short Description * <span className="text-[10px] text-gray-500 ml-2">({formData.shortDescription.length}/{MAX_SHORT_DESCRIPTION})</span>
                         </label>
                         <input
                           type="text"
@@ -1217,7 +1316,7 @@ export const CreatePortfolioModal = ({ isOpen, onClose, onSuccess, initialData, 
 
                       <div className="space-y-2 md:col-span-2">
                         <label className="text-sm font-bold text-gray-300 uppercase">
-                          Profile Summary <span className="text-[10px] text-gray-500 ml-2">({formData.profileSummary.length}/{MAX_PROFILE_SUMMARY})</span>
+                          Profile Summary * <span className="text-[10px] text-gray-500 ml-2">({formData.profileSummary.length}/{MAX_PROFILE_SUMMARY})</span>
                         </label>
                         <textarea
                           rows={3}
@@ -1251,7 +1350,7 @@ export const CreatePortfolioModal = ({ isOpen, onClose, onSuccess, initialData, 
                     </h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div className="space-y-2">
-                        <label className="text-sm font-bold text-gray-300 uppercase">Profile Photo</label>
+                        <label className="text-sm font-bold text-gray-300 uppercase">Profile Photo * </label>
                         <MediaUploader
                           accept="image"
                           value={formData.profilePhotoUrl}
@@ -1262,7 +1361,7 @@ export const CreatePortfolioModal = ({ isOpen, onClose, onSuccess, initialData, 
                         />
                       </div>
                       <div className="space-y-2">
-                        <label className="text-sm font-bold text-gray-300 uppercase">Cover Photo</label>
+                        <label className="text-sm font-bold text-gray-300 uppercase">Cover Photo * </label>
                         <MediaUploader
                           accept="image"
                           value={formData.coverPhotoUrl}
@@ -1273,7 +1372,7 @@ export const CreatePortfolioModal = ({ isOpen, onClose, onSuccess, initialData, 
                         />
                       </div>
                       <div className="space-y-2 md:col-span-2">
-                        <label className="text-sm font-bold text-gray-300 uppercase">Resume/CV</label>
+                        <label className="text-sm font-bold text-gray-300 uppercase">Resume/CV * </label>
                         <MediaUploader
                           accept="pdf"
                           value={formData.resumeUrl}
@@ -1290,7 +1389,7 @@ export const CreatePortfolioModal = ({ isOpen, onClose, onSuccess, initialData, 
                   <div className="space-y-4">
                     <div className="flex justify-between items-center border-b border-white/10 pb-2">
                       <h3 className="text-xs font-mono text-gray-500 uppercase tracking-widest">
-                        List Your Skills
+                        List Your Skills *
                       </h3>
                       <button
                         type="button"
@@ -1350,7 +1449,7 @@ export const CreatePortfolioModal = ({ isOpen, onClose, onSuccess, initialData, 
                   <div className="space-y-4">
                     <div className="flex justify-between items-center border-b border-white/10 pb-2">
                       <h3 className="text-xs font-mono text-gray-500 uppercase tracking-widest">
-                        Social Handles
+                        Social Handles *
                       </h3>
                       <button
                         type="button"
@@ -1476,6 +1575,37 @@ export const CreatePortfolioModal = ({ isOpen, onClose, onSuccess, initialData, 
               )}
             </div>
           </motion.div>
+
+          {/* Image Cropper Modal */}
+          <ImageCropper
+            isOpen={cropperOpen === "profile"}
+            imageSrc={imageToCrop}
+            aspect={1}
+            cropShape="rect"
+            title="Crop Profile Photo"
+            description="Adjust your photo to fit a square format (1:1). You can zoom and rotate as needed."
+            onCrop={handleCroppedImage}
+            onClose={() => {
+              setCropperOpen(false);
+              setImageToCrop("");
+              setPendingPhotoType(null);
+            }}
+          />
+
+          <ImageCropper
+            isOpen={cropperOpen === "cover"}
+            imageSrc={imageToCrop}
+            aspect={16 / 9}
+            cropShape="rect"
+            title="Crop Cover Photo"
+            description="Adjust your cover photo to fit a widescreen format (16:9). You can zoom and rotate as needed."
+            onCrop={handleCroppedImage}
+            onClose={() => {
+              setCropperOpen(false);
+              setImageToCrop("");
+              setPendingPhotoType(null);
+            }}
+          />
         </>
       )}
     </AnimatePresence>

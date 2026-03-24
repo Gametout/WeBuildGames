@@ -84,11 +84,11 @@ export function useAdvancedFilter(): UseAdvancedFilterReturn {
         const request: AdvancedFilterRequest = {
           jobCategories,
           jobStatuses,
-          skillNames: skillNames.map(s => s.toLowerCase()),
+          // skillNames: skillNames.map(s => s.toLowerCase()),
           minExperienceYears,
           maxExperienceYears,
           enginePreferences: normalizedEngines,
-          location,
+          // location,
           page,
           size: 20,
         };

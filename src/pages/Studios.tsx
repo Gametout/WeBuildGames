@@ -749,7 +749,7 @@ const Studios = () => {
                             className="flex items-center gap-2 px-3 py-2 rounded-lg bg-red-500/10 border border-red-500/30 text-red-400 hover:bg-red-500/20 transition-colors"
                           >
                             <Youtube className="w-4 h-4" />
-                            <span className="text-xs font-medium">YouTube</span>
+                            <span className="text-xs font-medium">Steam/Playstore</span>
                           </a>
                         )}
                         {selectedStudio.linkedinUrl && (

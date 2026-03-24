@@ -20,7 +20,7 @@ import { usePortfolios, usePortfolioRails } from "@/hooks/usePortfolios";
 import { usePortfolioSearch } from "@/hooks/usePortfolioSearch";
 import { useEliteAccess } from "@/hooks/useEliteAccess";
 import { useAdvancedFilter } from "@/hooks/useAdvancedFilter";
-import { Developer, PortfolioDetail, JobProfileStatus, PortfolioFilters } from "@/types/portfolio";
+import { Developer, PortfolioDetail, JobProfileStatus, PortfolioFilters, JobCategory, CATEGORY_TO_BACKEND } from "@/types/portfolio";
 
 // Demo Data for showcasing new design
 import { demoPortfolios, getDemoByCategory } from "@/data/demoPortfolios";
@@ -527,11 +527,10 @@ const MobileCategorySearchButton = ({
       <motion.button
         type="button"
         onClick={() => setIsOpen(true)}
-        className={`relative whitespace-nowrap px-3 py-2 text-[11px] font-bold uppercase tracking-wider transition-all duration-300 rounded-lg shrink-0 flex items-center gap-1.5 border ${
-          selectedCount > 0
+        className={`relative whitespace-nowrap px-3 py-2 text-[11px] font-bold uppercase tracking-wider transition-all duration-300 rounded-lg shrink-0 flex items-center gap-1.5 border ${selectedCount > 0
             ? "bg-[#FFAB00]/20 text-[#FFAB00] border-[#FFAB00]/40"
             : "bg-white/[0.05] text-gray-300 border-white/[0.1] hover:border-[#FFAB00]/30"
-        }`}
+          }`}
         whileTap={{ scale: 0.95 }}
       >
         <Search className="w-3 h-3" />
@@ -649,16 +648,14 @@ const MobileCategorySearchButton = ({
                           key={role}
                           type="button"
                           onClick={() => onCategoryToggle(role)}
-                          className={`w-full px-4 py-3 text-left text-sm transition-colors flex items-center gap-3 rounded-lg ${
-                            isSelected
+                          className={`w-full px-4 py-3 text-left text-sm transition-colors flex items-center gap-3 rounded-lg ${isSelected
                               ? 'bg-[#FFAB00]/20 text-[#FFAB00]'
                               : 'text-gray-300 hover:bg-white/5'
-                          }`}
+                            }`}
                           whileTap={{ scale: 0.98 }}
                         >
-                          <div className={`w-5 h-5 rounded border-2 flex items-center justify-center shrink-0 ${
-                            isSelected ? 'bg-[#FFAB00] border-[#FFAB00]' : 'border-gray-600'
-                          }`}>
+                          <div className={`w-5 h-5 rounded border-2 flex items-center justify-center shrink-0 ${isSelected ? 'bg-[#FFAB00] border-[#FFAB00]' : 'border-gray-600'
+                            }`}>
                             {isSelected && <CheckCircle className="w-3 h-3 text-black" />}
                           </div>
                           <span className="uppercase font-medium">{role}</span>
@@ -728,6 +725,18 @@ const Portfolios = () => {
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
+
+  // When modal opens, pre-populate advanced filter with currently active filters
+  useEffect(() => {
+    if (isMoreFiltersOpen) {
+      const mappedCategories = activeCategories
+        .map(cat => CATEGORY_TO_BACKEND[cat])
+        .filter(Boolean) as JobCategory[];
+
+      advancedFilter.setJobCategories(mappedCategories);
+      advancedFilter.setJobStatuses(activeStatuses);
+    }
+  }, [isMoreFiltersOpen]);
 
   const { dbUser } = useAuth();
   // Elite Access Hook
@@ -1038,17 +1047,17 @@ const Portfolios = () => {
           onClose={() => setIsMoreFiltersOpen(false)}
           jobCategories={advancedFilter.jobCategories}
           jobStatuses={advancedFilter.jobStatuses}
-          skillNames={advancedFilter.skillNames}
+          // skillNames={advancedFilter.skillNames}
           minExperienceYears={advancedFilter.minExperienceYears}
           maxExperienceYears={advancedFilter.maxExperienceYears}
           enginePreferences={advancedFilter.enginePreferences}
-          location={advancedFilter.location}
+          // location={advancedFilter.location}
           setJobCategories={advancedFilter.setJobCategories}
           setJobStatuses={advancedFilter.setJobStatuses}
-          setSkillNames={advancedFilter.setSkillNames}
+          // setSkillNames={advancedFilter.setSkillNames}
           setExperienceRange={advancedFilter.setExperienceRange}
           setEnginePreferences={advancedFilter.setEnginePreferences}
-          setLocation={advancedFilter.setLocation}
+          // setLocation={advancedFilter.setLocation}
           onApplyFilters={async () => {
             await advancedFilter.applyFilters(0);
             setUsingAdvancedFilter(true);
@@ -1090,286 +1099,286 @@ const Portfolios = () => {
         {/* STICKY WRAPPER: CompactHeader + Control Deck - pins below GlobalHeader */}
         <div className="sticky top-24 z-40 bg-background">
 
-        {/* CompactHeader with its own background for scroll-behind */}
-        <div className="relative bg-background">
-        <CompactHeader
-          onMyProfileClick={handleMyProfileClick}
-          isLoadingMyProfile={isFetchingMyProfile}
-          isDemoMode={isDemoMode}
-          onToggleDemo={() => setIsDemoMode(!isDemoMode)}
-          totalProfiles={totalProfiles}
-          showDemoToggle={showDemoFeature}
-        />
-        </div>
+          {/* CompactHeader with its own background for scroll-behind */}
+          <div className="relative bg-background">
+            <CompactHeader
+              onMyProfileClick={handleMyProfileClick}
+              isLoadingMyProfile={isFetchingMyProfile}
+              isDemoMode={isDemoMode}
+              onToggleDemo={() => setIsDemoMode(!isDemoMode)}
+              totalProfiles={totalProfiles}
+              showDemoToggle={showDemoFeature}
+            />
+          </div>
 
-        {/* CONTROL DECK - Redesigned */}
-        <section className="relative mb-0">
-          {/* Backdrop */}
-          <div className="absolute inset-0 bg-background" />
-          <div className="absolute inset-0 bg-[#0a0a0a]" />
-          <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#FFAB00]/30 to-transparent" />
+          {/* CONTROL DECK - Redesigned */}
+          <section className="relative mb-0">
+            {/* Backdrop */}
+            <div className="absolute inset-0 bg-background" />
+            <div className="absolute inset-0 bg-[#0a0a0a]" />
+            <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#FFAB00]/30 to-transparent" />
 
-          <div className="relative px-4 md:px-8 max-w-7xl mx-auto py-3 sm:py-4">
+            <div className="relative px-4 md:px-8 max-w-7xl mx-auto py-3 sm:py-4">
 
-            {/* Row 1: Search + Active Filter Indicator + View Toggle */}
-            <div className="flex items-center gap-2 sm:gap-3">
+              {/* Row 1: Search + Active Filter Indicator + View Toggle */}
+              <div className="flex items-center gap-2 sm:gap-3">
 
-              {/* Search - Expandable on mobile */}
-              <div className="relative flex-1 min-w-0 group">
-                <div className="absolute left-0 top-0 bottom-0 w-10 flex items-center justify-center pointer-events-none z-10">
-                  <Search className={`w-4 h-4 transition-colors duration-300 ${searchQuery ? 'text-[#FFAB00]' : 'text-gray-600 group-focus-within:text-[#FFAB00]'
-                    }`} />
+                {/* Search - Expandable on mobile */}
+                <div className="relative flex-1 min-w-0 group">
+                  <div className="absolute left-0 top-0 bottom-0 w-10 flex items-center justify-center pointer-events-none z-10">
+                    <Search className={`w-4 h-4 transition-colors duration-300 ${searchQuery ? 'text-[#FFAB00]' : 'text-gray-600 group-focus-within:text-[#FFAB00]'
+                      }`} />
+                  </div>
+                  <input
+                    type="text"
+                    placeholder="Search by name ..."
+                    className="w-full bg-white/[0.04] border border-white/[0.06] rounded-lg pl-10 pr-10 py-2.5 sm:py-3 text-sm text-white focus:outline-none focus:border-[#FFAB00]/50 focus:bg-white/[0.06] focus:shadow-[0_0_0_3px_rgba(255,171,0,0.08)] transition-all duration-300 font-mono placeholder:text-gray-600"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                  />
+
+                  {/* Right side icons */}
+                  <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1.5">
+                    {isSearching && (
+                      <Loader2 className="w-4 h-4 text-[#FFAB00] animate-spin" />
+                    )}
+                    {searchQuery && !isSearching && (
+                      <motion.button
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        onClick={clearSearch}
+                        className="p-0.5 rounded-full hover:bg-white/10 transition-colors"
+                      >
+                        <XCircle className="w-4 h-4 text-gray-500 hover:text-white" />
+                      </motion.button>
+                    )}
+                  </div>
+
+                  {/* Search results count - floating pill */}
+                  <AnimatePresence>
+                    {isSearchActive && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 4, scale: 0.95 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: 4, scale: 0.95 }}
+                        className="absolute -bottom-7 left-0 z-50"
+                      >
+                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-[#FFAB00]/10 border border-[#FFAB00]/20 rounded-full text-[10px] font-mono">
+                          <span className="w-1.5 h-1.5 rounded-full bg-[#FFAB00] animate-pulse" />
+                          <span className="text-[#FFAB00] font-bold">{isDemoMode ? displayDevelopers.length : totalResults}</span>
+                          <span className="text-gray-500">found</span>
+                        </span>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 </div>
-                <input
-                  type="text"
-                  placeholder="Search by name ..."
-                  className="w-full bg-white/[0.04] border border-white/[0.06] rounded-lg pl-10 pr-10 py-2.5 sm:py-3 text-sm text-white focus:outline-none focus:border-[#FFAB00]/50 focus:bg-white/[0.06] focus:shadow-[0_0_0_3px_rgba(255,171,0,0.08)] transition-all duration-300 font-mono placeholder:text-gray-600"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                />
 
-                {/* Right side icons */}
-                <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1.5">
-                  {isSearching && (
-                    <Loader2 className="w-4 h-4 text-[#FFAB00] animate-spin" />
-                  )}
-                  {searchQuery && !isSearching && (
-                    <motion.button
-                      initial={{ scale: 0 }}
-                      animate={{ scale: 1 }}
-                      onClick={clearSearch}
-                      className="p-0.5 rounded-full hover:bg-white/10 transition-colors"
-                    >
-                      <XCircle className="w-4 h-4 text-gray-500 hover:text-white" />
-                    </motion.button>
-                  )}
-                </div>
-
-                {/* Search results count - floating pill */}
+                {/* Active filter indicator - shows selected filters as chips */}
                 <AnimatePresence>
-                  {isSearchActive && (
+                  {hasActiveFilters && (
                     <motion.div
-                      initial={{ opacity: 0, y: 4, scale: 0.95 }}
-                      animate={{ opacity: 1, y: 0, scale: 1 }}
-                      exit={{ opacity: 0, y: 4, scale: 0.95 }}
-                      className="absolute -bottom-7 left-0 z-50"
+                      initial={{ scale: 0, width: 0 }}
+                      animate={{ scale: 1, width: "auto" }}
+                      exit={{ scale: 0, width: 0 }}
+                      className="hidden sm:flex items-center gap-1.5 shrink-0"
                     >
-                      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-[#FFAB00]/10 border border-[#FFAB00]/20 rounded-full text-[10px] font-mono">
-                        <span className="w-1.5 h-1.5 rounded-full bg-[#FFAB00] animate-pulse" />
-                        <span className="text-[#FFAB00] font-bold">{isDemoMode ? displayDevelopers.length : totalResults}</span>
-                        <span className="text-gray-500">found</span>
-                      </span>
+                      {/* Selected categories chips */}
+                      {activeCategories.slice(0, 2).map(cat => (
+                        <motion.button
+                          key={cat}
+                          initial={{ scale: 0 }}
+                          animate={{ scale: 1 }}
+                          exit={{ scale: 0 }}
+                          onClick={() => handleCategoryToggle(cat)}
+                          className="flex items-center gap-1 px-2 py-1.5 sm:py-2 bg-[#FFAB00]/15 border border-[#FFAB00]/25 rounded-lg text-[#FFAB00] text-[10px] sm:text-xs font-bold uppercase tracking-wide whitespace-nowrap overflow-hidden"
+                        >
+                          <span>{cat}</span>
+                          <X className="w-3 h-3 shrink-0" />
+                        </motion.button>
+                      ))}
+                      {activeCategories.length > 2 && (
+                        <span className="text-[10px] text-gray-500 font-mono">+{activeCategories.length - 2}</span>
+                      )}
+                      {/* Selected status chips */}
+                      {activeStatuses
+                        .filter(s => !(activeStatuses.length === 1 && s === JobProfileStatus.OPEN)) // Don't show default
+                        .slice(0, 1)
+                        .map(status => {
+                          const statusInfo = statusOptions.find(s => s.value === status);
+                          return (
+                            <motion.button
+                              key={status}
+                              initial={{ scale: 0 }}
+                              animate={{ scale: 1 }}
+                              exit={{ scale: 0 }}
+                              onClick={() => handleStatusToggle(status)}
+                              className="flex items-center gap-1 px-2 py-2 border rounded-lg text-xs font-bold uppercase tracking-wide whitespace-nowrap overflow-hidden"
+                              style={{
+                                backgroundColor: `${statusInfo?.color}15`,
+                                borderColor: `${statusInfo?.color}40`,
+                                color: statusInfo?.color
+                              }}
+                            >
+                              <span>{statusInfo?.label}</span>
+                              <X className="w-3 h-3 shrink-0" />
+                            </motion.button>
+                          );
+                        })}
+                      {activeStatuses.length > 1 && (
+                        <span className="text-[10px] text-gray-500 font-mono">+{activeStatuses.length - 1}</span>
+                      )}
+                      {/* Clear all */}
+                      {hasActiveFilters && (
+                        <motion.button
+                          initial={{ scale: 0 }}
+                          animate={{ scale: 1 }}
+                          exit={{ scale: 0 }}
+                          onClick={clearAllFilters}
+                          className="sm:hidden p-2 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 shrink-0"
+                        >
+                          <XCircle className="w-4 h-4" />
+                        </motion.button>
+                      )}
                     </motion.div>
                   )}
                 </AnimatePresence>
-              </div>
 
-              {/* Active filter indicator - shows selected filters as chips */}
-              <AnimatePresence>
-                {hasActiveFilters && (
-                  <motion.div
-                    initial={{ scale: 0, width: 0 }}
-                    animate={{ scale: 1, width: "auto" }}
-                    exit={{ scale: 0, width: 0 }}
-                    className="hidden sm:flex items-center gap-1.5 shrink-0"
+                {/* View Toggle - Refined */}
+                <div className="flex items-center bg-white/[0.04] border border-white/[0.06] rounded-lg p-0.5 shrink-0">
+                  <button
+                    onClick={() => setViewMode("grid")}
+                    className={`p-2 rounded-md transition-all duration-200 ${viewMode === "grid"
+                      ? "bg-[#FFAB00] text-black shadow-[0_0_12px_rgba(255,171,0,0.3)]"
+                      : "text-gray-600 hover:text-white hover:bg-white/5"
+                      }`}
+                    title="Grid View"
                   >
-                    {/* Selected categories chips */}
-                    {activeCategories.slice(0, 2).map(cat => (
-                      <motion.button
-                        key={cat}
-                        initial={{ scale: 0 }}
-                        animate={{ scale: 1 }}
-                        exit={{ scale: 0 }}
-                        onClick={() => handleCategoryToggle(cat)}
-                        className="flex items-center gap-1 px-2 py-1.5 sm:py-2 bg-[#FFAB00]/15 border border-[#FFAB00]/25 rounded-lg text-[#FFAB00] text-[10px] sm:text-xs font-bold uppercase tracking-wide whitespace-nowrap overflow-hidden"
-                      >
-                        <span>{cat}</span>
-                        <X className="w-3 h-3 shrink-0" />
-                      </motion.button>
-                    ))}
-                    {activeCategories.length > 2 && (
-                      <span className="text-[10px] text-gray-500 font-mono">+{activeCategories.length - 2}</span>
-                    )}
-                    {/* Selected status chips */}
-                    {activeStatuses
-                      .filter(s => !(activeStatuses.length === 1 && s === JobProfileStatus.OPEN)) // Don't show default
-                      .slice(0, 1)
-                      .map(status => {
-                        const statusInfo = statusOptions.find(s => s.value === status);
-                        return (
-                          <motion.button
-                            key={status}
-                            initial={{ scale: 0 }}
-                            animate={{ scale: 1 }}
-                            exit={{ scale: 0 }}
-                            onClick={() => handleStatusToggle(status)}
-                            className="flex items-center gap-1 px-2 py-2 border rounded-lg text-xs font-bold uppercase tracking-wide whitespace-nowrap overflow-hidden"
-                            style={{
-                              backgroundColor: `${statusInfo?.color}15`,
-                              borderColor: `${statusInfo?.color}40`,
-                              color: statusInfo?.color
-                            }}
-                          >
-                            <span>{statusInfo?.label}</span>
-                            <X className="w-3 h-3 shrink-0" />
-                          </motion.button>
-                        );
-                      })}
-                    {activeStatuses.length > 1 && (
-                      <span className="text-[10px] text-gray-500 font-mono">+{activeStatuses.length - 1}</span>
-                    )}
-                    {/* Clear all */}
-                    {hasActiveFilters && (
-                      <motion.button
-                        initial={{ scale: 0 }}
-                        animate={{ scale: 1 }}
-                        exit={{ scale: 0 }}
-                        onClick={clearAllFilters}
-                        className="sm:hidden p-2 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 shrink-0"
-                      >
-                        <XCircle className="w-4 h-4" />
-                      </motion.button>
-                    )}
-                  </motion.div>
-                )}
-              </AnimatePresence>
-
-              {/* View Toggle - Refined */}
-              <div className="flex items-center bg-white/[0.04] border border-white/[0.06] rounded-lg p-0.5 shrink-0">
-                <button
-                  onClick={() => setViewMode("grid")}
-                  className={`p-2 rounded-md transition-all duration-200 ${viewMode === "grid"
-                    ? "bg-[#FFAB00] text-black shadow-[0_0_12px_rgba(255,171,0,0.3)]"
-                    : "text-gray-600 hover:text-white hover:bg-white/5"
-                    }`}
-                  title="Grid View"
-                >
-                  <Grid className="w-4 h-4" />
-                </button>
-                <button
-                  onClick={() => setViewMode("list")}
-                  className={`p-2 rounded-md transition-all duration-200 ${viewMode === "list"
-                    ? "bg-[#FFAB00] text-black shadow-[0_0_12px_rgba(255,171,0,0.3)]"
-                    : "text-gray-600 hover:text-white hover:bg-white/5"
-                    }`}
-                  title="List View"
-                >
-                  <List className="w-4 h-4" />
-                </button>
+                    <Grid className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={() => setViewMode("list")}
+                    className={`p-2 rounded-md transition-all duration-200 ${viewMode === "list"
+                      ? "bg-[#FFAB00] text-black shadow-[0_0_12px_rgba(255,171,0,0.3)]"
+                      : "text-gray-600 hover:text-white hover:bg-white/5"
+                      }`}
+                    title="List View"
+                  >
+                    <List className="w-4 h-4" />
+                  </button>
+                </div>
               </div>
-            </div>
 
-            {/* Row 2: Category Filters - Fixed Layout */}
-            <div className="mt-3 relative">
-              {/* Desktop: Show first 6 categories + More button + Status filters */}
-              <div className="hidden sm:flex items-center gap-2 flex-wrap">
-                {/* "All" button - clears filters */}
-                <button
-                  onClick={clearAllFilters}
-                  className={`group relative whitespace-nowrap px-4 py-2 text-xs font-bold uppercase tracking-wider transition-all duration-300 rounded-lg shrink-0 ${activeCategories.length === 0 && activeStatuses.length === 0 // Only active when both are empty
-                    ? "bg-white text-black shadow-[0_0_20px_rgba(255,255,255,0.15)]"
-                    : "bg-white/[0.04] text-gray-500 hover:text-white hover:bg-white/[0.08] border border-white/[0.06]"
-                    }`}
-                >
-                  <span className="flex items-center gap-1.5">
-                    <Zap className={`w-3 h-3 ${activeCategories.length === 0 && activeStatuses.length === 0
-                      ? "text-black"
-                      : "text-[#FFAB00]"
-                      }`} />
-                    All
-                  </span>
-                </button>
+              {/* Row 2: Category Filters - Fixed Layout */}
+              <div className="mt-3 relative">
+                {/* Desktop: Show first 6 categories + More button + Status filters */}
+                <div className="hidden sm:flex items-center gap-2 flex-wrap">
+                  {/* "All" button - clears filters */}
+                  <button
+                    onClick={clearAllFilters}
+                    className={`group relative whitespace-nowrap px-4 py-2 text-xs font-bold uppercase tracking-wider transition-all duration-300 rounded-lg shrink-0 ${activeCategories.length === 0 && activeStatuses.length === 0 // Only active when both are empty
+                      ? "bg-white text-black shadow-[0_0_20px_rgba(255,255,255,0.15)]"
+                      : "bg-white/[0.04] text-gray-500 hover:text-white hover:bg-white/[0.08] border border-white/[0.06]"
+                      }`}
+                  >
+                    <span className="flex items-center gap-1.5">
+                      <Zap className={`w-3 h-3 ${activeCategories.length === 0 && activeStatuses.length === 0
+                        ? "text-black"
+                        : "text-[#FFAB00]"
+                        }`} />
+                      All
+                    </span>
+                  </button>
 
-                {/* Separator */}
-                <div className="w-px h-6 bg-white/[0.06] shrink-0 mx-0.5" />
+                  {/* Separator */}
+                  <div className="w-px h-6 bg-white/[0.06] shrink-0 mx-0.5" />
 
-                {/* First 8 role filters (multi-select) */}
-                {roles.slice(0, 8).map((role) => {
-                  const isSelected = activeCategories.includes(role);
-                  return (
-                    <button
-                      key={role}
-                      onClick={() => handleCategoryToggle(role)}
-                      className={`group relative whitespace-nowrap px-3 sm:px-4 py-2 text-[11px] sm:text-xs font-bold uppercase tracking-wider transition-all duration-300 rounded-lg shrink-0 flex items-center gap-1.5 ${isSelected
-                        ? "bg-[#FFAB00] text-black shadow-[0_0_20px_rgba(255,171,0,0.25)]"
-                        : "bg-white/[0.03] text-gray-500 hover:text-white hover:bg-white/[0.07] border border-transparent hover:border-white/[0.08]"
-                        }`}
-                    >
-                      {isSelected && <CheckCircle className="w-3 h-3" />}
-                      {role}
-                    </button>
-                  );
-                })}
-
-                {/* More button for desktop */}
-                {roles.length > 8 && (
-                  <MoreCategoriesButton
-                    roles={roles.slice(8)}
-                    activeCategories={activeCategories}
-                    onCategoryToggle={handleCategoryToggle}
-                  />
-                )}
-
-                {/* Advanced Filter Button */}
-                {/* <button
-                  onClick={() => setIsMoreFiltersOpen(true)}
-                  className={`group relative whitespace-nowrap px-3 sm:px-4 py-2 text-[11px] sm:text-xs font-bold uppercase tracking-wider transition-all duration-300 rounded-lg shrink-0 flex items-center gap-1.5 ${usingAdvancedFilter
-                    ? "bg-[#FF6B9D] text-white shadow-[0_0_20px_rgba(255,107,157,0.25)]"
-                    : "bg-white/[0.03] text-gray-500 hover:text-white hover:bg-white/[0.07] border border-transparent hover:border-white/[0.08]"
-                    }`}
-                  title="Open advanced filters for skill, experience, engine, location"
-                >
-                  <Sparkles className="w-3 h-3" />
-                  More Filters
-                </button> */}
-
-                {/* Separator before status filters */}
-                <div className="w-px h-6 bg-white/[0.06] shrink-0 mx-1" />
-
-                {/* Status Filters */}
-                {/* Status Filters */}
-                <div className="flex items-center gap-1.5">
-                  <Filter className="w-3 h-3 text-gray-500" />
-                  {statusOptions.map((status) => {
-                    const isSelected = activeStatuses.includes(status.value);
-                    const isDisabled = activeCategories.length === 0; // Disabled when ALL is selected
-
+                  {/* First 8 role filters (multi-select) */}
+                  {roles.slice(0, 8).map((role) => {
+                    const isSelected = activeCategories.includes(role);
                     return (
                       <button
-                        key={status.value}
-                        onClick={() => handleStatusToggle(status.value)}
-                        disabled={isDisabled}
-                        className={`group relative whitespace-nowrap px-3 py-2 text-[11px] font-bold uppercase tracking-wider transition-all duration-300 rounded-lg shrink-0 flex items-center gap-1.5 border ${isDisabled
-                          ? "cursor-not-allowed bg-white/[0.02] text-gray-600 border-white/[0.03]"
-                          : isSelected
-                            ? "bg-opacity-20 border-opacity-50"
-                            : "bg-white/[0.03] text-gray-500 hover:text-white hover:bg-white/[0.07] border-transparent hover:border-white/[0.08]"
+                        key={role}
+                        onClick={() => handleCategoryToggle(role)}
+                        className={`group relative whitespace-nowrap px-3 sm:px-4 py-2 text-[11px] sm:text-xs font-bold uppercase tracking-wider transition-all duration-300 rounded-lg shrink-0 flex items-center gap-1.5 ${isSelected
+                          ? "bg-[#FFAB00] text-black shadow-[0_0_20px_rgba(255,171,0,0.25)]"
+                          : "bg-white/[0.03] text-gray-500 hover:text-white hover:bg-white/[0.07] border border-transparent hover:border-white/[0.08]"
                           }`}
-                        style={isSelected && !isDisabled ? {
-                          backgroundColor: `${status.color}20`,
-                          borderColor: `${status.color}50`,
-                          color: status.color,
-                          boxShadow: `0 0 15px ${status.color}30`
-                        } : {}}
                       >
-                        {/* Always-visible colored dot */}
-                        <span
-                          className="w-2 h-2 rounded-full shrink-0"
-                          style={{
-                            backgroundColor: status.color,
-                            boxShadow: `0 0 6px ${status.color}50`,
-                            opacity: isDisabled ? 0.3 : 1
-                          }}
-                        />
                         {isSelected && <CheckCircle className="w-3 h-3" />}
-                        {status.label}
+                        {role}
                       </button>
                     );
                   })}
-                </div>
 
-                {/* Category search input for desktop */}
-                {/* <div className="ml-auto flex items-center gap-2">
+                  {/* More button for desktop */}
+                  {roles.length > 8 && (
+                    <MoreCategoriesButton
+                      roles={roles.slice(8)}
+                      activeCategories={activeCategories}
+                      onCategoryToggle={handleCategoryToggle}
+                    />
+                  )}
+
+                  {/* Advanced Filter Button */}
+                  <button
+                    onClick={() => setIsMoreFiltersOpen(true)}
+                    className={`group relative whitespace-nowrap px-3 sm:px-4 py-2 text-[11px] sm:text-xs font-bold uppercase tracking-wider transition-all duration-300 rounded-lg shrink-0 flex items-center gap-1.5 ${usingAdvancedFilter
+                      ? "bg-[#FF6B9D] text-white shadow-[0_0_20px_rgba(255,107,157,0.25)]"
+                      : "bg-white/[0.03] text-gray-500 hover:text-white hover:bg-white/[0.07] border border-transparent hover:border-white/[0.08]"
+                      }`}
+                    title="Open advanced filters for skill, experience, engine, location"
+                  >
+                    <Sparkles className="w-3 h-3" />
+                    More Filters
+                  </button>
+
+                  {/* Separator before status filters */}
+                  <div className="w-px h-6 bg-white/[0.06] shrink-0 mx-1" />
+
+                  {/* Status Filters */}
+                  {/* Status Filters */}
+                  <div className="flex items-center gap-1.5">
+                    <Filter className="w-3 h-3 text-gray-500" />
+                    {statusOptions.map((status) => {
+                      const isSelected = activeStatuses.includes(status.value);
+                      const isDisabled = activeCategories.length === 0; // Disabled when ALL is selected
+
+                      return (
+                        <button
+                          key={status.value}
+                          onClick={() => handleStatusToggle(status.value)}
+                          disabled={isDisabled}
+                          className={`group relative whitespace-nowrap px-3 py-2 text-[11px] font-bold uppercase tracking-wider transition-all duration-300 rounded-lg shrink-0 flex items-center gap-1.5 border ${isDisabled
+                            ? "cursor-not-allowed bg-white/[0.02] text-gray-600 border-white/[0.03]"
+                            : isSelected
+                              ? "bg-opacity-20 border-opacity-50"
+                              : "bg-white/[0.03] text-gray-500 hover:text-white hover:bg-white/[0.07] border-transparent hover:border-white/[0.08]"
+                            }`}
+                          style={isSelected && !isDisabled ? {
+                            backgroundColor: `${status.color}20`,
+                            borderColor: `${status.color}50`,
+                            color: status.color,
+                            boxShadow: `0 0 15px ${status.color}30`
+                          } : {}}
+                        >
+                          {/* Always-visible colored dot */}
+                          <span
+                            className="w-2 h-2 rounded-full shrink-0"
+                            style={{
+                              backgroundColor: status.color,
+                              boxShadow: `0 0 6px ${status.color}50`,
+                              opacity: isDisabled ? 0.3 : 1
+                            }}
+                          />
+                          {isSelected && <CheckCircle className="w-3 h-3" />}
+                          {status.label}
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  {/* Category search input for desktop */}
+                  {/* <div className="ml-auto flex items-center gap-2">
                   <div className="relative">
                     <input
                       type="text"
@@ -1397,89 +1406,89 @@ const Portfolios = () => {
                       <Search className="w-4 h-4" />
                     </div>
                   </div> */}
-                {/* </div> */}
-              </div>
+                  {/* </div> */}
+                </div>
 
-              {/* Mobile: Compact filter bar */}
-              <div className="sm:hidden">
-                <div className="flex items-center gap-1.5 flex-wrap">
-                  {/* "All" button */}
-                  <button
-                    onClick={clearAllFilters}
-                    className={`group relative whitespace-nowrap px-4 py-2 text-xs font-bold uppercase tracking-wider transition-all duration-300 rounded-lg shrink-0 ${!hasActiveFilters
-                      ? "bg-white text-black shadow-[0_0_20px_rgba(255,255,255,0.15)]"
-                      : "bg-white/[0.04] text-gray-500 hover:text-white hover:bg-white/[0.08] border border-white/[0.06]"
-                      }`}
-                  >
-                    <span className="flex items-center gap-1.5">
-                      <Zap className={`w-3 h-3 ${!hasActiveFilters ? "text-black" : "text-[#FFAB00]"}`} />
-                      All
-                    </span>
-                  </button>
+                {/* Mobile: Compact filter bar */}
+                <div className="sm:hidden">
+                  <div className="flex items-center gap-1.5 flex-wrap">
+                    {/* "All" button */}
+                    <button
+                      onClick={clearAllFilters}
+                      className={`group relative whitespace-nowrap px-4 py-2 text-xs font-bold uppercase tracking-wider transition-all duration-300 rounded-lg shrink-0 ${!hasActiveFilters
+                        ? "bg-white text-black shadow-[0_0_20px_rgba(255,255,255,0.15)]"
+                        : "bg-white/[0.04] text-gray-500 hover:text-white hover:bg-white/[0.08] border border-white/[0.06]"
+                        }`}
+                    >
+                      <span className="flex items-center gap-1.5">
+                        <Zap className={`w-3 h-3 ${!hasActiveFilters ? "text-black" : "text-[#FFAB00]"}`} />
+                        All
+                      </span>
+                    </button>
 
-                  {/* Separator */}
-                  <div className="w-px h-6 bg-white/[0.06] shrink-0 mx-0.5" />
+                    {/* Separator */}
+                    <div className="w-px h-6 bg-white/[0.06] shrink-0 mx-0.5" />
 
-                  {/* Status filters for mobile */}
-                  {/* Status filters for mobile */}
-                  {/* Status filters for mobile */}
-                  {statusOptions.map((status) => {
-                    const isSelected = activeStatuses.includes(status.value);
-                    const isDisabled = activeCategories.length === 0;
+                    {/* Status filters for mobile */}
+                    {/* Status filters for mobile */}
+                    {/* Status filters for mobile */}
+                    {statusOptions.map((status) => {
+                      const isSelected = activeStatuses.includes(status.value);
+                      const isDisabled = activeCategories.length === 0;
 
-                    return (
-                      <button
-                        key={status.value}
-                        onClick={() => handleStatusToggle(status.value)}
-                        disabled={isDisabled}
-                        className={`group relative whitespace-nowrap px-3 py-2 text-[11px] font-bold uppercase tracking-wider transition-all duration-300 rounded-lg shrink-0 flex items-center gap-1.5 border ${isDisabled
-                          ? "cursor-not-allowed bg-white/[0.02] text-gray-600 border-white/[0.03]"
-                          : isSelected
-                            ? ""
-                            : "bg-white/[0.05] text-gray-300 border-white/[0.1]"
-                          }`}
-                        style={
-                          isSelected && !isDisabled
-                            ? {
-                              backgroundColor: `${status.color}20`,
-                              borderColor: `${status.color}50`,
-                              color: status.color,
-                            }
-                            : {
-                              borderColor: isDisabled ? `${status.color}15` : `${status.color}30`,
-                            }
-                        }
-                      >
-                        {/* Always-visible colored dot */}
-                        <span
-                          className="w-2 h-2 rounded-full shrink-0"
-                          style={{
-                            backgroundColor: status.color,
-                            boxShadow: `0 0 6px ${status.color}50`,
-                            opacity: isDisabled ? 0.3 : 1
-                          }}
-                        />
-                        {isSelected && <CheckCircle className="w-3 h-3" />}
-                        {status.label.split(" ")[0]}
-                      </button>
-                    );
-                  })}
+                      return (
+                        <button
+                          key={status.value}
+                          onClick={() => handleStatusToggle(status.value)}
+                          disabled={isDisabled}
+                          className={`group relative whitespace-nowrap px-3 py-2 text-[11px] font-bold uppercase tracking-wider transition-all duration-300 rounded-lg shrink-0 flex items-center gap-1.5 border ${isDisabled
+                            ? "cursor-not-allowed bg-white/[0.02] text-gray-600 border-white/[0.03]"
+                            : isSelected
+                              ? ""
+                              : "bg-white/[0.05] text-gray-300 border-white/[0.1]"
+                            }`}
+                          style={
+                            isSelected && !isDisabled
+                              ? {
+                                backgroundColor: `${status.color}20`,
+                                borderColor: `${status.color}50`,
+                                color: status.color,
+                              }
+                              : {
+                                borderColor: isDisabled ? `${status.color}15` : `${status.color}30`,
+                              }
+                          }
+                        >
+                          {/* Always-visible colored dot */}
+                          <span
+                            className="w-2 h-2 rounded-full shrink-0"
+                            style={{
+                              backgroundColor: status.color,
+                              boxShadow: `0 0 6px ${status.color}50`,
+                              opacity: isDisabled ? 0.3 : 1
+                            }}
+                          />
+                          {isSelected && <CheckCircle className="w-3 h-3" />}
+                          {status.label.split(" ")[0]}
+                        </button>
+                      );
+                    })}
 
-                  {/* Separator */}
-                  <div className="w-px h-6 bg-white/[0.06] shrink-0 mx-0.5" />
+                    {/* Separator */}
+                    <div className="w-px h-6 bg-white/[0.06] shrink-0 mx-0.5" />
 
-                  {/* Mobile Category Search Button */}
-                  <MobileCategorySearchButton
-                    roles={roles}
-                    activeCategories={activeCategories}
-                    onCategoryToggle={handleCategoryToggle}
-                    onClearAll={() => setActiveCategories([])}
-                  />
+                    {/* Mobile Category Search Button */}
+                    <MobileCategorySearchButton
+                      roles={roles}
+                      activeCategories={activeCategories}
+                      onCategoryToggle={handleCategoryToggle}
+                      onClearAll={() => setActiveCategories([])}
+                    />
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        </section>
+          </section>
         </div>{/* end sticky wrapper */}
 
         {/* Spacer below sticky section */}

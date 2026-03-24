@@ -815,14 +815,14 @@ export const UserStudioFormModal = ({
                     <div className="space-y-2">
                       <label className="text-sm font-bold text-gray-300 uppercase flex items-center gap-2">
                         <Youtube className="w-4 h-4 text-red-500" />
-                        YouTube Channel
+                        Steam/PlayStore Channel
                       </label>
                       <input
                         type="url"
                         value={formData.youtubeUrl || ""}
                         onChange={(e) => updateField("youtubeUrl", e.target.value)}
                         className="w-full bg-black/50 border border-white/20 p-3 rounded-lg text-white focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-mono"
-                        placeholder="https://youtube.com/@yourstudio"
+                        placeholder="https://steam.com/@yourstudio"
                       />
                     </div>
 

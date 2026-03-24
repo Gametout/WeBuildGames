@@ -580,11 +580,9 @@ export interface PortfolioFilters {
 export interface AdvancedFilterRequest {
   jobCategories: JobCategory[];
   jobStatuses: JobProfileStatus[];
-  skillNames: string[];
   minExperienceYears: number | null;
   maxExperienceYears: number | null;
   enginePreferences: GameEngine[];
-  location: string | null;
   page: number;
   size: number;
 }
