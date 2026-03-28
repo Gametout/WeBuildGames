@@ -87,13 +87,15 @@ const faqSections: FAQSection[] = [
         question: "How to delete my portfolio?",
         answer: (
           <p>
-            To delete your portfolio, please reach out via the{" "}
-            <Link
-              to="/about"
+            To delete your portfolio, please reach out via{" "}
+            <a
+              href="https://www.linkedin.com/in/gametout/?originalSubdomain=in"
+              target="_blank"
+              rel="noopener noreferrer"
               className="text-[#FFAB00] underline hover:text-white transition-colors"
             >
-              contact form in the About section
-            </Link>
+              LinkedIn
+            </a>
             . Our team will assist you with the deletion process.
           </p>
         ),
@@ -148,13 +150,15 @@ const faqSections: FAQSection[] = [
         question: "How to delete my Studio Profile?",
         answer: (
           <p>
-            To delete your Studio Profile, please reach out via the{" "}
-            <Link
-              to="/about"
+            To delete your Studio Profile, please reach out via{" "}
+            <a
+              href="https://www.linkedin.com/in/gametout/?originalSubdomain=in"
+              target="_blank"
+              rel="noopener noreferrer"
               className="text-[#FFAB00] underline hover:text-white transition-colors"
             >
-              contact form in the About section
-            </Link>
+              LinkedIn
+            </a>
             . Our team will handle it for you.
           </p>
         ),
@@ -176,13 +180,15 @@ const faqSections: FAQSection[] = [
         question: "Can I delete my account?",
         answer: (
           <p>
-            Yes. To request account deletion, please use the{" "}
-            <Link
-              to="/about"
+            Yes. To request account deletion, please reach out via{" "}
+            <a
+              href="https://www.linkedin.com/in/gametout/?originalSubdomain=in"
+              target="_blank"
+              rel="noopener noreferrer"
               className="text-[#FFAB00] underline hover:text-white transition-colors"
             >
-              contact form in the About section
-            </Link>
+              LinkedIn
+            </a>
             . Your data will be permanently removed.
           </p>
         ),
@@ -244,9 +250,8 @@ const AccordionItem = ({
 
         {/* Question */}
         <span
-          className={`flex-1 text-sm sm:text-base font-medium transition-colors ${
-            isOpen ? "text-white" : "text-gray-400 group-hover:text-white"
-          }`}
+          className={`flex-1 text-sm sm:text-base font-medium transition-colors ${isOpen ? "text-white" : "text-gray-400 group-hover:text-white"
+            }`}
         >
           {faq.question}
         </span>
@@ -301,17 +306,16 @@ const SectionNavButton = ({
 }) => (
   <button
     onClick={onClick}
-    className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-bold uppercase tracking-wide transition-all whitespace-nowrap shrink-0 ${
-      isActive
-        ? "text-black shadow-lg"
-        : "bg-white/[0.04] text-gray-500 hover:text-white hover:bg-white/[0.08] border border-white/[0.06]"
-    }`}
+    className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-bold uppercase tracking-wide transition-all whitespace-nowrap shrink-0 ${isActive
+      ? "text-black shadow-lg"
+      : "bg-white/[0.04] text-gray-500 hover:text-white hover:bg-white/[0.08] border border-white/[0.06]"
+      }`}
     style={
       isActive
         ? {
-            backgroundColor: section.color,
-            boxShadow: `0 0 20px ${section.color}40`,
-          }
+          backgroundColor: section.color,
+          boxShadow: `0 0 20px ${section.color}40`,
+        }
         : {}
     }
   >
@@ -401,9 +405,8 @@ const FAQ = () => {
           {/* Search */}
           <div className="relative mb-6">
             <Search
-              className={`absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 transition-colors ${
-                searchQuery ? "text-[#FFAB00]" : "text-gray-600"
-              }`}
+              className={`absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 transition-colors ${searchQuery ? "text-[#FFAB00]" : "text-gray-600"
+                }`}
             />
             <input
               type="text"
@@ -508,12 +511,14 @@ const FAQ = () => {
             <p className="text-gray-500 text-sm mb-4 font-mono">
               Can't find what you're looking for? Reach out to us.
             </p>
-            <Link
-              to="/about"
+            <a
+              href="https://www.linkedin.com/in/gametout/?originalSubdomain=in"
+              target="_blank"
+              rel="noopener noreferrer"
               className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-[#FFAB00] to-[#FF8C00] text-black font-bold uppercase text-sm tracking-wide rounded-sm hover:shadow-[0_0_20px_rgba(255,171,0,0.3)] transition-shadow"
             >
-              Contact Us
-            </Link>
+              Contact on LinkedIn
+            </a>
           </motion.div>
         </div>
 

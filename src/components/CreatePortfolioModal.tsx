@@ -1320,7 +1320,7 @@ export const CreatePortfolioModal = ({ isOpen, onClose, onSuccess, initialData, 
                       </div>
 
                       <div className="space-y-2">
-                        <label className="text-sm font-bold text-gray-300 uppercase">Experience (Years)</label>
+                        <label className="text-sm font-bold text-gray-300 uppercase">Experience (Years) * </label>
                         <div className="relative">
                           <input
                             type="text"
@@ -1383,7 +1383,7 @@ export const CreatePortfolioModal = ({ isOpen, onClose, onSuccess, initialData, 
                       </div>
 
                       <div className="space-y-2">
-                        <label className="text-sm font-bold text-gray-300 uppercase">Status</label>
+                        <label className="text-sm font-bold text-gray-300 uppercase">Status *</label>
                         <StatusDropdown
                           value={formData.jobStatus}
                           onChange={(value) => setFormData({ ...formData, jobStatus: value })}

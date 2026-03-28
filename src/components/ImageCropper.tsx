@@ -21,7 +21,6 @@ const getCroppedImg = async (
 ): Promise<Blob> => {
   const image = new Image();
   image.crossOrigin = "anonymous";
-  image.src = imageSrc;
 
   return new Promise((resolve, reject) => {
     image.onload = () => {
@@ -82,6 +81,9 @@ const getCroppedImg = async (
     image.onerror = () => {
       reject(new Error("Failed to load image"));
     };
+
+    // Set src AFTER handlers are attached to prevent race condition
+    image.src = imageSrc;
   });
 };
 
@@ -113,22 +115,30 @@ export const ImageCropper = ({
 
     const img = new Image();
     img.crossOrigin = "anonymous";
-    img.src = imageSrc;
 
-    img.onload = () => {
+    const handleLoad = () => {
       console.log("✓ Image preloaded successfully");
       setIsImageLoaded(true);
       setImageLoadError(null);
     };
 
-    img.onerror = () => {
+    const handleError = () => {
       console.error("✗ Image preload failed for:", imageSrc);
       setImageLoadError("Failed to load image. Please try again.");
       setIsImageLoaded(false);
     };
 
-    // Cleanup
+    // Attach handlers BEFORE setting src to prevent race condition
+    img.onload = handleLoad;
+    img.onerror = handleError;
+
+    // Set src after handlers are attached
+    img.src = imageSrc;
+
+    // Cleanup - properly abort loading and detach handlers
     return () => {
+      img.onload = null;
+      img.onerror = null;
       img.src = "";
     };
   }, [isOpen, imageSrc]);
@@ -211,8 +221,26 @@ export const ImageCropper = ({
                     animate={{ opacity: 1 }}
                     className="text-center space-y-3"
                   >
-                    <div className="w-8 h-8 border-2 border-[#FFAB00]/30 border-t-[#FFAB00] rounded-full animate-spin mx-auto" />
-                    <p className="text-sm text-gray-400">Loading image preview...</p>
+                    {imageLoadError ? (
+                      <>
+                        <AlertCircle className="w-12 h-12 text-red-500 mx-auto" />
+                        <p className="text-sm text-red-400">{imageLoadError}</p>
+                        <motion.button
+                          type="button"
+                          onClick={onClose}
+                          className="mt-4 px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg transition-colors border border-white/20 font-semibold uppercase text-sm"
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
+                        >
+                          Close & Try Again
+                        </motion.button>
+                      </>
+                    ) : (
+                      <>
+                        <div className="w-8 h-8 border-2 border-[#FFAB00]/30 border-t-[#FFAB00] rounded-full animate-spin mx-auto" />
+                        <p className="text-sm text-gray-400">Loading image preview...</p>
+                      </>
+                    )}
                   </motion.div>
                 ) : (
                   <Crop
