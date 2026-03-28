@@ -791,7 +791,7 @@ export const UpdatePortfolioModal = ({
                     <h3 className="text-white font-bold uppercase text-sm tracking-wider">BASIC INFO</h3>
 
                     <div>
-                      <label className="block text-xs text-gray-400 uppercase mb-2">Name</label>
+                      <label className="block text-xs text-gray-400 uppercase mb-2">Name *</label>
                       <input
                         type="text"
                         value={formData.name}
@@ -802,7 +802,7 @@ export const UpdatePortfolioModal = ({
                     </div>
 
                     <div>
-                      <label className="block text-xs text-gray-400 uppercase mb-2">Short Description</label>
+                      <label className="block text-xs text-gray-400 uppercase mb-2">Short Description  *</label>
                       <input
                         type="text"
                         value={formData.shortDescription}
@@ -814,7 +814,7 @@ export const UpdatePortfolioModal = ({
 
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-xs text-gray-400 uppercase mb-2">Location</label>
+                        <label className="block text-xs text-gray-400 uppercase mb-2">Location *</label>
                         <input
                           type="text"
                           value={formData.location}
@@ -825,7 +825,7 @@ export const UpdatePortfolioModal = ({
                       </div>
 
                       <div>
-                        <label className="block text-xs text-gray-400 uppercase mb-2">Experience (Years)</label>
+                        <label className="block text-xs text-gray-400 uppercase mb-2">Experience (Years) *</label>
                         <input
                           type="number"
                           value={formData.experienceYears}
@@ -838,12 +838,12 @@ export const UpdatePortfolioModal = ({
 
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-xs text-gray-400 uppercase mb-2">Primary Role</label>
+                        <label className="block text-xs text-gray-400 uppercase mb-2">Primary Role *</label>
                         <RoleDropdown value={formData.role} onChange={(role) => setFormData({ ...formData, role })} />
                       </div>
 
                       <div>
-                        <label className="block text-xs text-gray-400 uppercase mb-2">Job Status</label>
+                        <label className="block text-xs text-gray-400 uppercase mb-2">Job Status *</label>
                         <StatusDropdown value={formData.jobStatus} onChange={(status) => setFormData({ ...formData, jobStatus: status })} />
                       </div>
                     </div>
@@ -876,7 +876,7 @@ export const UpdatePortfolioModal = ({
                     </div>
 
                     <div>
-                      <label className="block text-xs text-gray-400 uppercase mb-2">Profile Summary</label>
+                      <label className="block text-xs text-gray-400 uppercase mb-2">Profile Summary *</label>
                       <textarea
                         value={formData.profileSummary}
                         onChange={(e) => setFormData({ ...formData, profileSummary: e.target.value })}
@@ -893,7 +893,7 @@ export const UpdatePortfolioModal = ({
 
                     {/* Profile Photo */}
                     <div>
-                      <label className="block text-xs text-gray-400 uppercase mb-3">Profile Photo</label>
+                      <label className="block text-xs text-gray-400 uppercase mb-3">Profile Photo *</label>
                       {formData.profilePhotoUrl ? (
                         <div className="space-y-3">
                           <div className="relative w-32 h-32 rounded-lg overflow-hidden border border-[#FFAB00]/30">
@@ -918,6 +918,7 @@ export const UpdatePortfolioModal = ({
                           onUpload={handleProfilePhotoUpload}
                           onComplete={(publicUrl) => setFormData(prev => ({ ...prev, profilePhotoUrl: publicUrl }))}
                           accept="image"
+                          deferredUpload
                           label="Upload Profile Photo"
                         />
                       )}
@@ -925,7 +926,7 @@ export const UpdatePortfolioModal = ({
 
                     {/* Cover Photo */}
                     <div>
-                      <label className="block text-xs text-gray-400 uppercase mb-3">Cover Photo</label>
+                      <label className="block text-xs text-gray-400 uppercase mb-3">Cover Photo *</label>
                       {formData.coverPhotoUrl ? (
                         <div className="space-y-3">
                           <div className="relative w-full h-32 rounded-lg overflow-hidden border border-[#FFAB00]/30">
@@ -950,6 +951,7 @@ export const UpdatePortfolioModal = ({
                           onUpload={handleCoverPhotoUpload}
                           onComplete={(publicUrl) => setFormData(prev => ({ ...prev, coverPhotoUrl: publicUrl }))}
                           accept="image"
+                          deferredUpload
                           label="Upload Cover Photo"
                         />
                       )}
@@ -957,7 +959,7 @@ export const UpdatePortfolioModal = ({
 
                     {/* Resume */}
                     <div>
-                      <label className="block text-xs text-gray-400 uppercase mb-3">Resume/CV</label>
+                      <label className="block text-xs text-gray-400 uppercase mb-3">Resume/CV *</label>
                       {formData.resumeUrl ? (
                         <div className="space-y-3">
                           <a
@@ -993,7 +995,7 @@ export const UpdatePortfolioModal = ({
                   {/* Skills Section */}
                   <div className="space-y-4">
                     <div className="flex items-center justify-between">
-                      <h3 className="text-white font-bold uppercase text-sm tracking-wider">Skills (Max 3)</h3>
+                      <h3 className="text-white font-bold uppercase text-sm tracking-wider">Skills (Max 3) *</h3>
                       {formData.skills.length < 3 && (
                         <motion.button
                           type="button"
@@ -1062,7 +1064,7 @@ export const UpdatePortfolioModal = ({
                   {/* Social Links Section */}
                   <div className="space-y-4">
                     <div className="flex items-center justify-between">
-                      <h3 className="text-white font-bold uppercase text-sm tracking-wider">Social Links (Max 5)</h3>
+                      <h3 className="text-white font-bold uppercase text-sm tracking-wider">Social Links (Max 5) *</h3>
                       {formData.socials.length < 5 && (
                         <motion.button
                           type="button"

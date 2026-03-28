@@ -1482,6 +1482,7 @@ export const CreatePortfolioModal = ({ isOpen, onClose, onSuccess, initialData, 
                           value={formData.profilePhotoUrl}
                           onUpload={handleProfilePhotoUpload}
                           onComplete={(url) => setFormData({ ...formData, profilePhotoUrl: url })}
+                          deferredUpload
                           onClear={handleProfilePhotoDelete}
                           label="profile photo"
                         />
@@ -1493,6 +1494,7 @@ export const CreatePortfolioModal = ({ isOpen, onClose, onSuccess, initialData, 
                           value={formData.coverPhotoUrl}
                           onUpload={handleCoverPhotoUpload}
                           onComplete={(url) => setFormData({ ...formData, coverPhotoUrl: url })}
+                          deferredUpload
                           onClear={handleCoverPhotoDelete}
                           label="cover photo"
                         />

@@ -201,8 +201,8 @@ const StudioCard = ({
 
         {/* Rating */}
         <div className="flex items-center justify-between mb-3 p-2 rounded bg-white/5 border border-white/5">
-          <CompactStarRating rating={Math.round(studio.ratings)} size="sm" />
-          <span className="text-xs font-mono text-[#FFAB00]">{studio.ratings.toFixed(1)}</span>
+          <CompactStarRating rating={Math.round(studio.averageRating)} size="sm" />
+          <span className="text-xs font-mono text-[#FFAB00]">{studio.averageRating.toFixed(1)}</span>
         </div>
 
         {/* Footer */}

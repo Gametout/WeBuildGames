@@ -1,6 +1,6 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, RotateCw, Check } from "lucide-react";
+import { X, RotateCw, Check, AlertCircle } from "lucide-react";
 import Crop from "react-easy-crop";
 import "react-easy-crop/react-easy-crop.css";
 
@@ -20,6 +20,7 @@ const getCroppedImg = async (
   pixelCrop: { x: number; y: number; width: number; height: number }
 ): Promise<Blob> => {
   const image = new Image();
+  image.crossOrigin = "anonymous";
   image.src = imageSrc;
 
   return new Promise((resolve, reject) => {
@@ -32,28 +33,47 @@ const getCroppedImg = async (
         return;
       }
 
-      // Set canvas size to the cropped area
-      canvas.width = pixelCrop.width;
-      canvas.height = pixelCrop.height;
+      // Guard against zero/invalid dimensions from transient crop state.
+      const cropX = Math.max(0, Math.floor(pixelCrop.x));
+      const cropY = Math.max(0, Math.floor(pixelCrop.y));
+      const cropWidth = Math.max(1, Math.floor(pixelCrop.width));
+      const cropHeight = Math.max(1, Math.floor(pixelCrop.height));
+
+      // Set canvas size to the cropped area.
+      canvas.width = cropWidth;
+      canvas.height = cropHeight;
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = "high";
 
       // Draw the cropped image
       ctx.drawImage(
         image,
-        pixelCrop.x,
-        pixelCrop.y,
-        pixelCrop.width,
-        pixelCrop.height,
+        cropX,
+        cropY,
+        cropWidth,
+        cropHeight,
         0,
         0,
-        pixelCrop.width,
-        pixelCrop.height
+        cropWidth,
+        cropHeight
       );
 
-      // Convert canvas to blob
-      canvas.toBlob((blob) => {
+      // Convert canvas to blob (with dataURL fallback for browsers where toBlob is flaky).
+      canvas.toBlob(async (blob) => {
         if (blob) {
+          console.log("✓ Canvas blob created successfully");
           resolve(blob);
-        } else {
+          return;
+        }
+
+        console.warn("⚠ Canvas toBlob failed, using fallback");
+        try {
+          const dataUrl = canvas.toDataURL("image/jpeg", 0.95);
+          const fallbackBlob = await fetch(dataUrl).then((res) => res.blob());
+          console.log("✓ Fallback blob created successfully");
+          resolve(fallbackBlob);
+        } catch (err) {
+          console.error("✗ Both blob creation methods failed:", err);
           reject(new Error("Failed to create blob"));
         }
       }, "image/jpeg", 0.95);
@@ -80,6 +100,38 @@ export const ImageCropper = ({
   const [rotation, setRotation] = useState(0);
   const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [isImageLoaded, setIsImageLoaded] = useState(false);
+  const [imageLoadError, setImageLoadError] = useState<string | null>(null);
+
+  // Preload image before rendering Crop component
+  useEffect(() => {
+    if (!isOpen || !imageSrc) {
+      setIsImageLoaded(false);
+      setImageLoadError(null);
+      return;
+    }
+
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    img.src = imageSrc;
+
+    img.onload = () => {
+      console.log("✓ Image preloaded successfully");
+      setIsImageLoaded(true);
+      setImageLoadError(null);
+    };
+
+    img.onerror = () => {
+      console.error("✗ Image preload failed for:", imageSrc);
+      setImageLoadError("Failed to load image. Please try again.");
+      setIsImageLoaded(false);
+    };
+
+    // Cleanup
+    return () => {
+      img.src = "";
+    };
+  }, [isOpen, imageSrc]);
 
   const handleCropComplete = useCallback(
     (_: any, croppedAreaPixels: any) => {
@@ -152,24 +204,47 @@ export const ImageCropper = ({
               </div>
 
               {/* Cropper Container */}
-              <div className="flex-1 relative bg-black overflow-hidden">
-                <Crop
-                  image={imageSrc}
-                  crop={crop}
-                  zoom={zoom}
-                  aspect={aspect}
-                  cropShape={cropShape}
-                  showGrid={true}
-                  onCropChange={setCrop}
-                  onCropComplete={handleCropComplete}
-                  onZoomChange={setZoom}
-                  onRotationChange={setRotation}
-                  rotation={rotation}
-                />
+              <div className="flex-1 relative bg-black overflow-hidden flex items-center justify-center">
+                {!isImageLoaded ? (
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    className="text-center space-y-3"
+                  >
+                    <div className="w-8 h-8 border-2 border-[#FFAB00]/30 border-t-[#FFAB00] rounded-full animate-spin mx-auto" />
+                    <p className="text-sm text-gray-400">Loading image preview...</p>
+                  </motion.div>
+                ) : (
+                  <Crop
+                    image={imageSrc}
+                    crop={crop}
+                    zoom={zoom}
+                    aspect={aspect}
+                    cropShape={cropShape}
+                    showGrid={true}
+                    onCropChange={setCrop}
+                    onCropComplete={handleCropComplete}
+                    onZoomChange={setZoom}
+                    onRotationChange={setRotation}
+                    rotation={rotation}
+                  />
+                )}
               </div>
 
               {/* Controls */}
               <div className="border-t border-white/10 p-6 space-y-4 bg-white/5">
+                {/* Error Message */}
+                {imageLoadError && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="flex items-center gap-2 p-3 bg-red-500/20 border border-red-500/50 rounded-lg text-red-300 text-sm"
+                  >
+                    <AlertCircle className="w-4 h-4 flex-shrink-0" />
+                    <span>{imageLoadError}</span>
+                  </motion.div>
+                )}
+
                 {/* Zoom Control */}
                 <div className="space-y-2">
                   <label className="text-sm font-bold text-gray-300 uppercase">
@@ -210,7 +285,7 @@ export const ImageCropper = ({
                     </button>
                     <button
                       onClick={handleConfirm}
-                      disabled={isProcessing}
+                      disabled={isProcessing || !isImageLoaded}
                       className="flex items-center gap-2 px-6 py-2 bg-[#FFAB00] hover:bg-white text-black rounded-lg transition-colors font-semibold uppercase text-sm disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       <Check className="w-4 h-4" />

@@ -15,6 +15,8 @@ interface MediaUploaderProps {
   localPreview?: string; // blob URL for preview before upload completes
   onUpload: (file: File) => Promise<MediaUploadResult>;
   onComplete: (publicUrl: string) => void;
+  // For crop-first workflows: onUpload can open cropper and complete later via parent state.
+  deferredUpload?: boolean;
   onClear?: () => void;
   caption?: string;
   onCaptionChange?: (caption: string) => void;
@@ -55,6 +57,7 @@ export const MediaUploader = ({
   localPreview,
   onUpload,
   onComplete,
+  deferredUpload = false,
   onClear,
   caption,
   onCaptionChange,
@@ -124,10 +127,13 @@ export const MediaUploader = ({
 
     try {
       const result = await onUpload(file);
-      
+
       if (result.publicUrl) {
         onComplete(result.publicUrl);
         setUploadState({ isUploading: false, progress: 100, error: null });
+      } else if (deferredUpload) {
+        // Crop-first flow: upload happens after user confirms crop.
+        setUploadState({ isUploading: false, progress: 0, error: null });
       } else {
         throw new Error("No public URL returned");
       }
@@ -142,7 +148,7 @@ export const MediaUploader = ({
     } finally {
       // Don't revoke blob URL immediately - keep for preview
     }
-  }, [accept, onUpload, onComplete]);
+  }, [accept, onUpload, onComplete, deferredUpload]);
 
   // Handle drag events
   const handleDragOver = useCallback((e: React.DragEvent) => {

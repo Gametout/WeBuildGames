@@ -528,8 +528,8 @@ const MobileCategorySearchButton = ({
         type="button"
         onClick={() => setIsOpen(true)}
         className={`relative whitespace-nowrap px-3 py-2 text-[11px] font-bold uppercase tracking-wider transition-all duration-300 rounded-lg shrink-0 flex items-center gap-1.5 border ${selectedCount > 0
-            ? "bg-[#FFAB00]/20 text-[#FFAB00] border-[#FFAB00]/40"
-            : "bg-white/[0.05] text-gray-300 border-white/[0.1] hover:border-[#FFAB00]/30"
+          ? "bg-[#FFAB00]/20 text-[#FFAB00] border-[#FFAB00]/40"
+          : "bg-white/[0.05] text-gray-300 border-white/[0.1] hover:border-[#FFAB00]/30"
           }`}
         whileTap={{ scale: 0.95 }}
       >
@@ -649,8 +649,8 @@ const MobileCategorySearchButton = ({
                           type="button"
                           onClick={() => onCategoryToggle(role)}
                           className={`w-full px-4 py-3 text-left text-sm transition-colors flex items-center gap-3 rounded-lg ${isSelected
-                              ? 'bg-[#FFAB00]/20 text-[#FFAB00]'
-                              : 'text-gray-300 hover:bg-white/5'
+                            ? 'bg-[#FFAB00]/20 text-[#FFAB00]'
+                            : 'text-gray-300 hover:bg-white/5'
                             }`}
                           whileTap={{ scale: 0.98 }}
                         >
@@ -1484,7 +1484,87 @@ const Portfolios = () => {
                       onCategoryToggle={handleCategoryToggle}
                       onClearAll={() => setActiveCategories([])}
                     />
+
+                    {/* ⭐ MORE FILTERS BUTTON - Added for Mobile */}
+                    <motion.button
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => setIsMoreFiltersOpen(true)}
+                      className={`relative whitespace-nowrap px-3 py-2 text-[11px] font-bold uppercase tracking-wider transition-all duration-300 rounded-lg shrink-0 flex items-center gap-1.5 border ${usingAdvancedFilter
+                        ? "bg-[#FF6B9D]/20 text-[#FF6B9D] border-[#FF6B9D]/40 shadow-[0_0_15px_rgba(255,107,157,0.2)]"
+                        : "bg-white/[0.05] text-gray-300 border-white/[0.1] hover:border-[#FF6B9D]/30 hover:text-white"
+                        }`}
+                    >
+                      <Sparkles className="w-3 h-3" />
+                      <span>Filters</span>
+                      {usingAdvancedFilter && (
+                        <span className="ml-0.5 w-2 h-2 rounded-full bg-[#FF6B9D] animate-pulse" />
+                      )}
+                    </motion.button>
+
+                    {/* Clear All Filters - Mobile (shows when any filter is active) */}
+                    <AnimatePresence>
+                      {(hasActiveFilters || usingAdvancedFilter) && (
+                        <motion.button
+                          initial={{ scale: 0, opacity: 0 }}
+                          animate={{ scale: 1, opacity: 1 }}
+                          exit={{ scale: 0, opacity: 0 }}
+                          onClick={() => {
+                            clearAllFilters();
+                            setUsingAdvancedFilter(false);
+                          }}
+                          className="p-2 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 shrink-0"
+                          title="Clear all filters"
+                        >
+                          <XCircle className="w-4 h-4" />
+                        </motion.button>
+                      )}
+                    </AnimatePresence>
                   </div>
+                  {/* Active filters summary - Mobile */}
+                  <AnimatePresence>
+                    {(activeCategories.length > 0 || usingAdvancedFilter) && (
+                      <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: "auto", opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        className="overflow-hidden"
+                      >
+                        <div className="flex flex-wrap items-center gap-1.5 mt-2 pt-2 border-t border-white/[0.04]">
+                          {/* Category chips */}
+                          {activeCategories.slice(0, 3).map((cat) => (
+                            <motion.button
+                              key={cat}
+                              initial={{ scale: 0 }}
+                              animate={{ scale: 1 }}
+                              exit={{ scale: 0 }}
+                              onClick={() => handleCategoryToggle(cat)}
+                              className="flex items-center gap-1 px-2 py-1 bg-[#FFAB00]/15 border border-[#FFAB00]/25 rounded-full text-[#FFAB00] text-[10px] font-bold uppercase"
+                            >
+                              {cat}
+                              <X className="w-3 h-3" />
+                            </motion.button>
+                          ))}
+                          {activeCategories.length > 3 && (
+                            <span className="text-[10px] text-gray-500 font-mono">
+                              +{activeCategories.length - 3} more
+                            </span>
+                          )}
+
+                          {/* Advanced filter indicator */}
+                          {usingAdvancedFilter && (
+                            <motion.span
+                              initial={{ scale: 0 }}
+                              animate={{ scale: 1 }}
+                              className="flex items-center gap-1 px-2 py-1 bg-[#FF6B9D]/15 border border-[#FF6B9D]/25 rounded-full text-[#FF6B9D] text-[10px] font-bold uppercase"
+                            >
+                              <Sparkles className="w-3 h-3" />
+                              Advanced
+                            </motion.span>
+                          )}
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 </div>
               </div>
             </div>

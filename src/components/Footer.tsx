@@ -169,7 +169,7 @@ export const Footer = () => {
         {/* Bottom */}
         <div className="pt-8 border-t border-border flex flex-col md:flex-row items-center justify-between gap-4">
           <p className="text-xs text-muted-foreground">
-            © {new Date().getFullYear()} GameTout. All rights reserved.
+            © {new Date().getFullYear()} WeBuildGame. All rights reserved.
           </p>
 
           <div className="flex items-center gap-2">
