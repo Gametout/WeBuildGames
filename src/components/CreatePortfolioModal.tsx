@@ -7,7 +7,7 @@ import {
 } from "lucide-react";
 import { usePortfolioMutation } from "@/hooks/usePortfolioDetail";
 import { useAuth } from "@/context/AuthContext";
-import { JobCategory, JobProfileStatus, PortfolioRequest, CATEGORY_TO_BACKEND, DISPLAY_TO_STATUS, PortfolioDetail, BACKEND_TO_CATEGORY, GameEngine } from "@/types/portfolio";
+import { JobCategory, JobProfileStatus, PortfolioRequest, CATEGORY_TO_BACKEND, DISPLAY_TO_STATUS, PortfolioDetail, BACKEND_TO_CATEGORY, GameEngine, fromBackendEngine, getEngineDisplay } from "@/types/portfolio";
 import { MediaUploader } from "@/components/MediaUploader";
 import { mediaUploadService } from "@/services/mediaUploadService";
 import { portfolioService } from "@/services/portfolioService";
@@ -73,14 +73,8 @@ const roles = [
 ];
 const statusOptions = ["Open for Work", "Freelance", "Deployed"];
 
-const engineOptions = ["Unity", "Unreal", "Godot", "Other"];
-
-const engineToEnum: Record<string, GameEngine> = {
-  "Unity": GameEngine.UNITY,
-  "Unreal": GameEngine.UNREAL,
-  "Godot": GameEngine.GODOT,
-  "Other": GameEngine.OTHER,
-};
+// Engine options are now managed by helper functions in types/portfolio.ts
+// No need for separate engineToEnum mapping - use fromDisplayEngine() for conversion
 
 
 const MAX_SHORT_DESCRIPTION = 100;
@@ -493,8 +487,9 @@ const StatusDropdown = ({ value, onChange }: { value: string; onChange: (value: 
 };
 
 // Engine Preference Dropdown Component
-const EngineDropdown = ({ value, onChange }: { value: string; onChange: (value: string) => void }) => {
+const EngineDropdown = ({ value, onChange }: { value: GameEngine | null; onChange: (value: GameEngine | null) => void }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const displayLabel = value ? getEngineDisplay(value) : "Select Engine";
 
   return (
     <div className="relative w-full">
@@ -505,7 +500,7 @@ const EngineDropdown = ({ value, onChange }: { value: string; onChange: (value: 
           }`}
         whileTap={{ scale: 0.98 }}
       >
-        <span className="uppercase">{value || "Select Engine"}</span>
+        <span className="uppercase">{displayLabel}</span>
         <motion.div
           animate={{ rotate: isOpen ? 180 : 0 }}
           transition={{ duration: 0.2 }}
@@ -537,26 +532,29 @@ const EngineDropdown = ({ value, onChange }: { value: string; onChange: (value: 
                 zIndex: 50
               }}
             >
-              {engineOptions.map((engine) => (
-                <motion.button
-                  key={engine}
-                  type="button"
-                  onClick={() => {
-                    onChange(engine);
-                    setIsOpen(false);
-                  }}
-                  className={`w-full px-4 py-3 text-left text-sm hover:bg-white/10 transition-colors flex items-center gap-2 ${value === engine
-                    ? 'bg-[#FFAB00]/20 text-[#FFAB00] font-bold'
-                    : 'text-gray-300'
-                    }`}
-                  whileHover={{ x: 4 }}
-                >
-                  <span className="uppercase">{engine}</span>
-                  {value === engine && (
-                    <CheckCircle className="w-4 h-4 ml-auto" />
-                  )}
-                </motion.button>
-              ))}
+              {Object.values(GameEngine).map((engineValue) => {
+                const engineLabel = getEngineDisplay(engineValue);
+                return (
+                  <motion.button
+                    key={engineValue}
+                    type="button"
+                    onClick={() => {
+                      onChange(engineValue);
+                      setIsOpen(false);
+                    }}
+                    className={`w-full px-4 py-3 text-left text-sm hover:bg-white/10 transition-colors flex items-center gap-2 ${value === engineValue
+                      ? 'bg-[#FFAB00]/20 text-[#FFAB00] font-bold'
+                      : 'text-gray-300'
+                      }`}
+                    whileHover={{ x: 4 }}
+                  >
+                    <span className="uppercase">{engineLabel}</span>
+                    {value === engineValue && (
+                      <CheckCircle className="w-4 h-4 ml-auto" />
+                    )}
+                  </motion.button>
+                );
+              })}
             </motion.div>
           </>
         )}
@@ -585,7 +583,23 @@ export const CreatePortfolioModal = ({ isOpen, onClose, onSuccess, initialData, 
   const [isCheckingPortfolio, setIsCheckingPortfolio] = useState(false);
 
   // Form State
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<{
+    name: string;
+    shortDescription: string;
+    role: string;
+    location: string;
+    experienceYears: number;
+    jobStatus: string;
+    profileSummary: string;
+    contactEmail: string;
+    mobile: string;
+    profilePhotoUrl: string;
+    coverPhotoUrl: string;
+    resumeUrl: string;
+    enginePreference: GameEngine | null;
+    skills: { name: string; score: number }[];
+    socials: { platform: string; url: string }[];
+  }>({
     name: "",
     shortDescription: "",
     role: "Programmer",
@@ -598,7 +612,7 @@ export const CreatePortfolioModal = ({ isOpen, onClose, onSuccess, initialData, 
     profilePhotoUrl: "",
     coverPhotoUrl: "",
     resumeUrl: "",
-    enginePreference: "",
+    enginePreference: null,
     skills: [{ name: "", score: 33 }],
     socials: [{ platform: "", url: "" }]
   });
@@ -632,7 +646,7 @@ export const CreatePortfolioModal = ({ isOpen, onClose, onSuccess, initialData, 
         profilePhotoUrl: initialData.profilePhotoUrl || "",
         coverPhotoUrl: initialData.coverPhotoUrl || "",
         resumeUrl: initialData.resumeUrl || "",
-        enginePreference: initialData.enginePreference || "",
+        enginePreference: fromBackendEngine(initialData.enginePreference) || null,
         // Ensure arrays have at least one empty item if empty
         skills: initialData.skills && initialData.skills.length > 0
           ? initialData.skills.map(s => ({ name: s.name, score: normalizeSkillScore(s.score) }))
@@ -656,7 +670,7 @@ export const CreatePortfolioModal = ({ isOpen, onClose, onSuccess, initialData, 
         profilePhotoUrl: "",
         coverPhotoUrl: "",
         resumeUrl: "",
-        enginePreference: "",
+        enginePreference: null,
         skills: [{ name: "", score: 33 }],
         socials: [{ platform: "", url: "" }]
       });
@@ -702,7 +716,7 @@ export const CreatePortfolioModal = ({ isOpen, onClose, onSuccess, initialData, 
         profilePhotoUrl: "",
         coverPhotoUrl: "",
         resumeUrl: "",
-        enginePreference: "",
+        enginePreference: null,
         skills: [{ name: "", score: 33 }],
         socials: [{ platform: "", url: "" }]
       });
@@ -927,7 +941,7 @@ export const CreatePortfolioModal = ({ isOpen, onClose, onSuccess, initialData, 
       profilePhotoUrl: clean(formData.profilePhotoUrl),
       coverPhotoUrl: clean(formData.coverPhotoUrl),
       resumeUrl: clean(formData.resumeUrl),
-      enginePreference: formData.enginePreference ? engineToEnum[formData.enginePreference] : undefined,
+      enginePreference: formData.enginePreference || undefined,
       skills: formData.skills
         .filter(s => s.name && s.name.trim() !== "")
         .map(s => ({ name: s.name.trim(), score: s.score })),
@@ -1441,6 +1455,7 @@ export const CreatePortfolioModal = ({ isOpen, onClose, onSuccess, initialData, 
                           accept="image"
                           value={formData.profilePhotoUrl}
                           onUpload={handleProfilePhotoUpload}
+                          onComplete={(url) => setFormData(prev => ({ ...prev, profilePhotoUrl: url }))}
                           onClear={handleProfilePhotoDelete}
                           label="profile photo"
                         />
@@ -1451,6 +1466,7 @@ export const CreatePortfolioModal = ({ isOpen, onClose, onSuccess, initialData, 
                           accept="image"
                           value={formData.coverPhotoUrl}
                           onUpload={handleCoverPhotoUpload}
+                          onComplete={(url) => setFormData(prev => ({ ...prev, coverPhotoUrl: url }))}
                           onClear={handleCoverPhotoDelete}
                           label="cover photo"
                         />

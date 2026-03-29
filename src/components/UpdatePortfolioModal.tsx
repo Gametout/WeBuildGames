@@ -9,7 +9,7 @@ import { usePortfolioMutation } from "@/hooks/usePortfolioDetail";
 import { useAuth } from "@/context/AuthContext";
 import {
   JobCategory, JobProfileStatus, PortfolioRequest, CATEGORY_TO_BACKEND,
-  DISPLAY_TO_STATUS, PortfolioDetail, BACKEND_TO_CATEGORY, GameEngine
+  DISPLAY_TO_STATUS, PortfolioDetail, BACKEND_TO_CATEGORY, GameEngine, fromBackendEngine, getEngineDisplay
 } from "@/types/portfolio";
 import { MediaUploader } from "@/components/MediaUploader";
 import { mediaUploadService } from "@/services/mediaUploadService";
@@ -73,14 +73,9 @@ const roles = [
 ];
 const statusOptions = ["Open for Work", "Freelance", "Deployed"];
 
-const engineOptions = ["Unity", "Unreal", "Godot", "Other"];
+// Engine options are managed by helper functions in types/portfolio.ts
+// No need for separate engineToEnum mapping - use fromDisplayEngine() for conversion
 
-const engineToEnum: Record<string, GameEngine> = {
-  "Unity": GameEngine.UNITY,
-  "Unreal": GameEngine.UNREAL,
-  "Godot": GameEngine.GODOT,
-  "Other": GameEngine.OTHER,
-};
 const MAX_RESUME_SIZE_BYTES = 5 * 1024 * 1024;
 
 const PLATFORM_OPTIONS = [
@@ -323,8 +318,9 @@ const StatusDropdown = ({ value, onChange }: {
 };
 
 // Engine Preference Dropdown Component
-const EngineDropdown = ({ value, onChange }: { value: string; onChange: (value: string) => void }) => {
+const EngineDropdown = ({ value, onChange }: { value: GameEngine | null; onChange: (value: GameEngine | null) => void }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const displayLabel = value ? getEngineDisplay(value) : "Select Engine";
 
   return (
     <div className="relative w-full">
@@ -334,7 +330,7 @@ const EngineDropdown = ({ value, onChange }: { value: string; onChange: (value: 
         className={`w-full text-left bg-black/50 border-b border-white/20 text-white text-sm font-mono py-2 px-3 hover:border-[#FFAB00] transition-colors flex items-center justify-between rounded-sm ${isOpen ? "border-[#FFAB00]" : ""}`}
         whileTap={{ scale: 0.98 }}
       >
-        <span className="uppercase">{value || "Select Engine"}</span>
+        <span className="uppercase">{displayLabel}</span>
         <motion.div
           animate={{ rotate: isOpen ? 180 : 0 }}
           transition={{ duration: 0.2 }}
@@ -359,23 +355,26 @@ const EngineDropdown = ({ value, onChange }: { value: string; onChange: (value: 
               exit={{ opacity: 0, y: 10, scale: 0.95 }}
               className="absolute left-0 right-0 mt-2 bg-[#0a0a0a] border border-[#FFAB00]/30 rounded-lg shadow-2xl z-50"
             >
-              {engineOptions.map((engine) => (
-                <button
-                  key={engine}
-                  type="button"
-                  onClick={() => {
-                    onChange(engine);
-                    setIsOpen(false);
-                  }}
-                  className={`w-full px-4 py-2.5 text-left text-sm flex items-center gap-3 border-b border-white/5 last:border-b-0 ${
-                    value === engine
-                      ? "text-[#FFAB00] bg-[#FFAB00]/10"
-                      : "text-gray-300 hover:text-white hover:bg-white/10"
-                  } transition-colors`}
-                >
-                  <span className="uppercase">{engine}</span>
-                </button>
-              ))}
+              {Object.values(GameEngine).map((engineValue) => {
+                const engineLabel = getEngineDisplay(engineValue);
+                return (
+                  <button
+                    key={engineValue}
+                    type="button"
+                    onClick={() => {
+                      onChange(engineValue);
+                      setIsOpen(false);
+                    }}
+                    className={`w-full px-4 py-2.5 text-left text-sm flex items-center gap-3 border-b border-white/5 last:border-b-0 ${
+                      value === engineValue
+                        ? "text-[#FFAB00] bg-[#FFAB00]/10"
+                        : "text-gray-300 hover:text-white hover:bg-white/10"
+                    } transition-colors`}
+                  >
+                    <span className="uppercase">{engineLabel}</span>
+                  </button>
+                );
+              })}
             </motion.div>
           </>
         )}
@@ -397,7 +396,23 @@ export const UpdatePortfolioModal = ({
   const { createOrUpdate, loading: isSubmitting, error: submitError, success, reset } = usePortfolioMutation();
   const { isAuthenticated, dbUser } = useAuth();
 
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<{
+    name: string;
+    shortDescription: string;
+    role: string;
+    location: string;
+    experienceYears: number;
+    jobStatus: string;
+    profileSummary: string;
+    contactEmail: string;
+    mobile: string;
+    profilePhotoUrl: string;
+    coverPhotoUrl: string;
+    resumeUrl: string;
+    enginePreference: GameEngine | null;
+    skills: { name: string; score: number }[];
+    socials: { platform: string; url: string }[];
+  }>({
     name: "",
     shortDescription: "",
     role: "Programmer",
@@ -410,7 +425,7 @@ export const UpdatePortfolioModal = ({
     profilePhotoUrl: "",
     coverPhotoUrl: "",
     resumeUrl: "",
-    enginePreference: "",
+    enginePreference: null,
     skills: [{ name: "", score: 33 }],
     socials: [{ platform: "", url: "" }]
   });
@@ -441,7 +456,7 @@ export const UpdatePortfolioModal = ({
         profilePhotoUrl: initialData.profilePhotoUrl || "",
         coverPhotoUrl: initialData.coverPhotoUrl || "",
         resumeUrl: initialData.resumeUrl || "",
-        enginePreference: initialData.enginePreference || "",
+        enginePreference: fromBackendEngine(initialData.enginePreference) || null,
         skills: initialData.skills && initialData.skills.length > 0
           ? initialData.skills.map(s => ({ name: s.name, score: normalizeSkillScore(s.score) }))
           : [{ name: "", score: 33 }],
@@ -676,7 +691,7 @@ export const UpdatePortfolioModal = ({
       profilePhotoUrl: clean(formData.profilePhotoUrl),
       coverPhotoUrl: clean(formData.coverPhotoUrl),
       resumeUrl: clean(formData.resumeUrl),
-      enginePreference: formData.enginePreference ? engineToEnum[formData.enginePreference] : undefined,
+      enginePreference: formData.enginePreference || undefined,
       skills: formData.skills
         .filter(s => s.name && s.name.trim() !== "")
         .map(s => ({ name: s.name.trim(), score: s.score })),
@@ -876,6 +891,7 @@ export const UpdatePortfolioModal = ({
                       ) : (
                         <MediaUploader
                           onUpload={handleProfilePhotoUpload}
+                          onComplete={(url) => setFormData(prev => ({ ...prev, profilePhotoUrl: url }))}
                           accept="image"
                           label="Upload Profile Photo"
                         />
@@ -907,6 +923,7 @@ export const UpdatePortfolioModal = ({
                       ) : (
                         <MediaUploader
                           onUpload={handleCoverPhotoUpload}
+                          onComplete={(url) => setFormData(prev => ({ ...prev, coverPhotoUrl: url }))}
                           accept="image"
                           label="Upload Cover Photo"
                         />
@@ -940,6 +957,7 @@ export const UpdatePortfolioModal = ({
                       ) : (
                         <MediaUploader
                           onUpload={handleResumeUpload}
+                          onComplete={(url) => setFormData(prev => ({ ...prev, resumeUrl: url }))}
                           accept="pdf"
                           label="Upload Resume"
                         />

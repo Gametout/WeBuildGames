@@ -609,6 +609,31 @@ export const ALL_GAME_ENGINES = [
 ];
 
 // ===========================================
+// GAME ENGINE HELPER FUNCTIONS
+// ===========================================
+
+/** Convert backend enum string to GameEngine enum value */
+export const fromBackendEngine = (backendValue: string | null | undefined): GameEngine | null => {
+  if (!backendValue) return null;
+  const engine = Object.values(GameEngine).find(e => e === backendValue);
+  return engine || null;
+};
+
+/** Get display label for a GameEngine enum value */
+export const getEngineDisplay = (engine: GameEngine | null | undefined): string => {
+  if (!engine) return "";
+  const found = ALL_GAME_ENGINES.find(e => e.value === engine);
+  return found?.label || "";
+};
+
+/** Convert display label to GameEngine enum value */
+export const fromDisplayEngine = (displayLabel: string): GameEngine | null => {
+  if (!displayLabel) return null;
+  const found = ALL_GAME_ENGINES.find(e => e.label === displayLabel);
+  return found?.value as GameEngine || null;
+};
+
+// ===========================================
 // Frontend UI Types (derived from backend data)
 // ===========================================
 
