@@ -198,13 +198,15 @@ const faqSections: FAQSection[] = [
         answer: (
           <p>
             Just go to the{" "}
-            <Link
-              to="/about"
+            <a
+              href="https://www.linkedin.com/in/gametout/?originalSubdomain=in"
+              target="_blank"
+              rel="noopener noreferrer"
               className="text-[#FFAB00] underline hover:text-white transition-colors"
             >
-              About section
-            </Link>{" "}
-            and use the contact form. We'll get back to you as soon as possible.
+              LinkedIn
+            </a>
+            and send us a message. We'll get back to you as soon as possible.
           </p>
         ),
       },
