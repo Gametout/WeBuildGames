@@ -317,7 +317,7 @@ const TacticalRow = ({ dev, onClick, isRestricted, onUnlock }: {
       </div>
     </div>
     <div className="w-full md:w-1/4">
-      <div className="text-[#FFAB00] font-bold text-sm mb-1">{dev.role}</div>
+      <div className="text-[#FFAB00] font-bold text-sm mb-1">{dev.category}</div>
       <div className="flex gap-1 flex-wrap">
         {dev.badges.map((b: string, i: number) => (
           <span key={i} className="text-[10px] bg-white/10 px-1 rounded text-gray-300">{b}</span>
