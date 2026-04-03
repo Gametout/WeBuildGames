@@ -14,6 +14,7 @@ import { ResponsiveMasonryGrid } from "@/components/MasonryGrid";
 import { PricingModal } from "@/components/PricingModal";
 import { ClassifiedOverlay } from "@/components/ClassifiedOverlay";
 import MoreFiltersModal from "@/components/MoreFiltersModal";
+import { InfiniteScrollTrigger } from "@/components/InfiniteScrollTrigger";
 
 // API Hooks
 import { usePortfolios, usePortfolioRails } from "@/hooks/usePortfolios";
@@ -758,6 +759,8 @@ const Portfolios = () => {
     developers: apiDevelopers,
     loading: listLoading,
     error: listError,
+    hasMore: listHasMore,
+    loadMore: loadMoreList,
     getByCategory,
     fetchWithFilters,
     fetchPortfolios,
@@ -786,6 +789,8 @@ const Portfolios = () => {
     setSearchQuery,
     isSearching,
     totalResults,
+    hasMore: searchHasMore,
+    loadMore: loadMoreSearch,
     clear: clearSearch
   } = usePortfolioSearch({ debounceMs: 300, minChars: 2 });
 
@@ -829,7 +834,7 @@ const Portfolios = () => {
   // Determine which data to show
   const isSearchActive = searchQuery.length >= 2;
   const displayDevelopers = useMemo(() => {
-    if (usingAdvancedFilter && advancedFilter.developers.length > 0) {
+    if (usingAdvancedFilter) {
       return advancedFilter.developers;
     }
     if (isSearchActive) {
@@ -847,6 +852,50 @@ const Portfolios = () => {
   }, [isSearchActive, isDemoMode, searchQuery, searchResults, developers, usingAdvancedFilter, advancedFilter.developers]);
 
   const isRestricted = !isElite && isAuthenticated;
+
+  const paginationMode = usingAdvancedFilter
+    ? "advanced"
+    : isSearchActive
+      ? "search"
+      : "normal";
+
+  const activeHasMore = isDemoMode
+    ? false
+    : paginationMode === "advanced"
+      ? advancedFilter.hasMore
+      : paginationMode === "search"
+        ? searchHasMore
+        : listHasMore;
+
+  const activePaginationLoading = isDemoMode
+    ? false
+    : paginationMode === "advanced"
+      ? advancedFilter.loading
+      : paginationMode === "search"
+        ? searchLoading
+        : listLoading;
+
+  const handleInfiniteLoadMore = useCallback(async () => {
+    if (isDemoMode) return;
+
+    if (paginationMode === "advanced") {
+      await advancedFilter.loadMore();
+      return;
+    }
+
+    if (paginationMode === "search") {
+      await loadMoreSearch();
+      return;
+    }
+
+    await loadMoreList();
+  }, [
+    isDemoMode,
+    paginationMode,
+    advancedFilter,
+    loadMoreSearch,
+    loadMoreList,
+  ]);
 
   const handleSelectDev = (dev: Developer) => {
     if (isRestricted && !canViewFullProfile(dev.id)) {
@@ -1716,6 +1765,15 @@ const Portfolios = () => {
             )}
 
           </AnimatePresence>
+
+          {!error && !isDemoMode && displayDevelopers.length > 0 && (
+            <InfiniteScrollTrigger
+              hasMore={activeHasMore}
+              isLoading={activePaginationLoading}
+              onLoadMore={handleInfiniteLoadMore}
+              rootMargin="100px"
+            />
+          )}
         </section>
 
         <Footer />
