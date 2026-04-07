@@ -63,7 +63,7 @@ const socialLinks = [
   },
   {
     icon: <SteamIcon className="w-5 h-5" />,
-    href: "https://store.steampowered.com/YOUR_PAGE",
+    href: "https://store.steampowered.com/curator/45509592/",
     label: "Steam",
     hoverColor: "#66c0f4",
   },
@@ -75,7 +75,7 @@ const socialLinks = [
   },
   {
     icon: <LinkedinIcon className="w-5 h-5" />,
-    href: "https://www.linkedin.com/in/gametout/?originalSubdomain=in",
+    href: "https://www.linkedin.com/in/thegametout/?originalSubdomain=in",
     label: "LinkedIn",
     hoverColor: "#0A66C2",
   },
