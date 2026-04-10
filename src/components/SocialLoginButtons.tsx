@@ -81,7 +81,7 @@ export default function SocialLoginButtons({ onError, className = "" }: SocialLo
       <button
         onClick={() => handleLogin("discord", loginWithDiscord)}
         disabled={loading !== null}
-        className={`${buttonBaseClass} bg-[#5865F2] text-white hover:bg-[#4752C4]`}
+        className={`${buttonBaseClass} bg-[#5865F2] text-white hover:bg-[#4752C4] hidden`}
       >
         {loading === "discord" ? (
           <LoadingSpinner />
