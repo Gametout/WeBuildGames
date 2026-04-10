@@ -246,7 +246,7 @@ export const SecurityAuthModal = ({
                 type="button"
                 disabled={loading}
                 onClick={() => handleSocialLogin("discord")}
-                className="flex items-center justify-center gap-2 p-2.5 border border-white/10 hover:border-[#5865F2] hover:bg-[#5865F2]/10 transition-colors group disabled:opacity-50"
+                className="flex items-center justify-center gap-2 p-2.5 border border-white/10 hover:border-[#5865F2] hover:bg-[#5865F2]/10 transition-colors group disabled:opacity-50 hidden"
               >
                 <DiscordIcon className="w-4 h-4 text-gray-400 group-hover:text-[#5865F2]" />
                 <span className="text-xs font-bold text-gray-400 group-hover:text-[#5865F2] uppercase">Discord</span>
