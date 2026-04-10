@@ -220,7 +220,7 @@ export const SecurityAuthModal = ({
               </span>
             </div>
 
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 gap-3 justify-items-center">
               {/* Firebase Providers */}
               <button
                 type="button"
