@@ -43,8 +43,9 @@ const faqSections: FAQSection[] = [
               Top right corner, click{" "}
               <span className="text-[#FFAB00] font-bold">Sign In</span> &
               register or login with your{" "}
-              <span className="text-white font-semibold">Gmail ID</span> or{" "}
-              <span className="text-[#7289DA] font-semibold">Discord</span>.
+              <span className="text-white font-semibold">Gmail ID</span> 
+              {/* or{" "}
+              <span className="text-[#7289DA] font-semibold">Discord</span> */}
             </p>
             <p>
               Then just tap{" "}
@@ -116,8 +117,9 @@ const faqSections: FAQSection[] = [
               Top right corner, click{" "}
               <span className="text-[#FFAB00] font-bold">Sign In</span> &
               register or login with your{" "}
-              <span className="text-white font-semibold">Gmail ID</span> or{" "}
-              <span className="text-[#7289DA] font-semibold">Discord</span>.
+              <span className="text-white font-semibold">Email ID</span> 
+              {/* or{" "}
+              <span className="text-[#7289DA] font-semibold">Discord</span>. */}
             </p>
             <p>
               Then just tap{" "}
@@ -174,7 +176,7 @@ const faqSections: FAQSection[] = [
       {
         question: "What if I forget my password?",
         answer:
-          "Your account is connected through Gmail or Discord — there's no separate password to remember. Simply sign in with the same provider you used to register.",
+          "Your account is connected through Email or Gmail — there's no separate password to remember. Simply sign in with the same provider you used to register.",
       },
       {
         question: "Can I delete my account?",
