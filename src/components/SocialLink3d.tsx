@@ -49,7 +49,7 @@ const socials = [
     icon: Linkedin, 
     label: "LinkedIn", 
     handle: "/gametout",
-    url: "https://www.linkedin.com/in/thegametout/?originalSubdomain=in",
+    url: "https://www.linkedin.com/in/gametout/?originalSubdomain=in",
     color: "#0077B5",
     gradient: "from-[#0077B5] to-[#005885]",
     description: "Career & networking",

@@ -89,7 +89,7 @@ const faqSections: FAQSection[] = [
           <p>
             To delete your portfolio, please reach out via{" "}
             <a
-              href="https://www.linkedin.com/in/thegametout/?originalSubdomain=in"
+              href="https://www.linkedin.com/in/gametout/?originalSubdomain=in"
               target="_blank"
               rel="noopener noreferrer"
               className="text-[#FFAB00] underline hover:text-white transition-colors"
@@ -152,7 +152,7 @@ const faqSections: FAQSection[] = [
           <p>
             To delete your Studio Profile, please reach out via{" "}
             <a
-              href="https://www.linkedin.com/in/thegametout/?originalSubdomain=in"
+              href="https://www.linkedin.com/in/gametout/?originalSubdomain=in"
               target="_blank"
               rel="noopener noreferrer"
               className="text-[#FFAB00] underline hover:text-white transition-colors"
@@ -182,7 +182,7 @@ const faqSections: FAQSection[] = [
           <p>
             Yes. To request account deletion, please reach out via{" "}
             <a
-              href="https://www.linkedin.com/in/thegametout/?originalSubdomain=in"
+              href="https://www.linkedin.com/in/gametout/?originalSubdomain=in"
               target="_blank"
               rel="noopener noreferrer"
               className="text-[#FFAB00] underline hover:text-white transition-colors"
@@ -199,7 +199,7 @@ const faqSections: FAQSection[] = [
           <p>
             Just go to the{" "}
             <a
-              href="https://www.linkedin.com/in/thegametout/?originalSubdomain=in"
+              href="https://www.linkedin.com/in/gametout/?originalSubdomain=in"
               target="_blank"
               rel="noopener noreferrer"
               className="text-[#FFAB00] underline hover:text-white transition-colors"
@@ -514,7 +514,7 @@ const FAQ = () => {
               Can't find what you're looking for? Reach out to us.
             </p>
             <a
-              href="https://www.linkedin.com/in/thegametout/?originalSubdomain=in"
+              href="https://www.linkedin.com/in/gametout/?originalSubdomain=in"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-[#FFAB00] to-[#FF8C00] text-black font-bold uppercase text-sm tracking-wide rounded-sm hover:shadow-[0_0_20px_rgba(255,171,0,0.3)] transition-shadow"
